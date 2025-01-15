@@ -16,7 +16,6 @@ public class GlobalExceptionAdvice {
     // 공통된 오류 처리 로직
     @ExceptionHandler(CommonException.class)
     public ResponseEntity<HttpResponseDto> handleUserException(CommonException e) {
-        log.error("에러 메세지: ", e);
         return of(e.getResponseExceptionEnum());
     }
 }

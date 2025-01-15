@@ -1,0 +1,55 @@
+<configuration>
+    <!-- 공통 로그 출력 패턴 (콘솔용 색상 포함) -->
+    <property name="CONSOLE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %highlight(%-5level) %cyan(%logger{36}) - %msg%n" />
+
+    <!-- 공통 로그 출력 패턴 (파일용, 색상 제외) -->
+    <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n" />
+
+    <!-- 콘솔 로그 출력 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 예외 로그 설정 (파일) -->
+    <appender name="EXCEPTION_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/exception-log.txt</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/exception-log-%d{yyyy-MM-dd}.txt</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 애플리케이션 로그 설정 (파일) -->
+    <appender name="APPLICATION_LOGGER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/service-log.txt</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/service-log-%d{yyyy-MM-dd}.txt</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 루트 로거 설정 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+    <!-- 예외 로거 설정 -->
+    <logger name="EXCEPTION_LOGGER" level="ERROR" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="EXCEPTION_LOG" />
+    </logger>
+
+    <!-- 애플리케이션 로거 설정 -->
+    <logger name="APPLICATION_LOGGER" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="APPLICATION_LOGGER" />
+    </logger>
+</configuration>
