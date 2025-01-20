@@ -1,8 +1,10 @@
 package com.pm.projectmanager.common.response;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class HttpResponseDto {
 
 	private Integer statusCode;
@@ -18,5 +20,10 @@ public class HttpResponseDto {
 		this.statusCode = statusCode;
 		this.message = message;
 		this.data = data;
+	}
+
+	public HttpResponseDto(ResponseExceptionEnum responseExceptionEnum) {
+		this.statusCode = responseExceptionEnum.getHttpStatus().value();
+		this.message = responseExceptionEnum.getMessage();
 	}
 }
