@@ -1,4 +1,4 @@
-package com.pm.projectmanager.exception;
+package com.pm.projectmanager.common.response;
 
 import org.springframework.http.HttpStatus;
 
@@ -9,7 +9,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ResponseExceptionEnum {
 
-	EXCEPTION_TEST(HttpStatus.BAD_REQUEST, "예외처리 예시입니다.");
+	USERNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "중복된 아이디입니다."),
+	NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "중복된 닉네임입니다.");
 	private final HttpStatus httpStatus;
 	private final String message;
 }

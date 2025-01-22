@@ -2,7 +2,6 @@ package com.pm.projectmanager.common.response;
 
 import org.springframework.http.ResponseEntity;
 
-import com.pm.projectmanager.exception.ResponseExceptionEnum;
 public class ResponseUtils {
 
 	public static ResponseEntity<HttpResponseDto> of(ResponseExceptionEnum responseExceptionEnum) {
