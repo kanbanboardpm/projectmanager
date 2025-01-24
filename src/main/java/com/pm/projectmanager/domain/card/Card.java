@@ -1,14 +1,17 @@
 package com.pm.projectmanager.domain.card;
 
 import com.pm.projectmanager.domain.category.Category;
+import com.pm.projectmanager.domain.user.User;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "cards")
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Card {
 
     @Id
@@ -21,9 +24,9 @@ public class Card {
     private LocalDateTime endDate;
     private LocalDateTime completeDate;
 
-//    @ManyToOne
-//    @JoinColumn(name = "user_id", nullable = false)
-//    private User user;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
