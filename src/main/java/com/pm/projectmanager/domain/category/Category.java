@@ -2,6 +2,7 @@ package com.pm.projectmanager.domain.category;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +19,15 @@ public class Category {
     private String name;
     private String description;
 
-//    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Project> projects;
+    @Builder
+    public Category(String color, String name, String description) {
+        this.color = color;
+        this.name = name;
+        this.description = description;
+    }
+
+//    @ManyToOne
+//    @JoinColumn(name = "project_id", nullable = false)
+//    private Project project;
+
 }
