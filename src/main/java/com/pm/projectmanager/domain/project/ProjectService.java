@@ -11,6 +11,7 @@ import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.authority.AuthorityService;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateRequestDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
+import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
 import com.pm.projectmanager.exception.AuthorityNullException;
 import com.pm.projectmanager.exception.ProjectNullException;
 import com.pm.projectmanager.security.UserDetailsImpl;
@@ -58,5 +59,21 @@ public class ProjectService {
 		return authorities.stream()
 			.map(authority -> new ProjectResponseDto(authority.getProject()))
 			.collect(Collectors.toList());
+	}
+
+	@Transactional
+	public void update(ProjectUpdateDto requestDto, UserDetailsImpl userDetails, Long projectId) {
+
+		Project project = projectRepository.findById(projectId)
+			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
+
+		if (!authorityRepository.existsByProjectIdAndUserId(projectId, userDetails.getUser().getId())) {
+			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
+		}
+
+		project.updateName(requestDto.getName());
+		project.updateColor(requestDto.getColor());
+
+		projectRepository.save(project);
 	}
 }

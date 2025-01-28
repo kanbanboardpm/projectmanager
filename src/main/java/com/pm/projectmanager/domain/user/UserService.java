@@ -19,7 +19,7 @@ public class UserService {
 
 	@Transactional
 	public void signup(SignupRequestDto requestDto) {
-		if (userRepository.existsByUsername(requestDto.getEmail())) {
+		if (userRepository.existsByEmail(requestDto.getEmail())) {
 			throw new UserAlreadyExistsException(ResponseExceptionEnum.EMAIL_ALREADY_EXISTS);
 		}
 		if (userRepository.existsByNickname(requestDto.getNickname())) {

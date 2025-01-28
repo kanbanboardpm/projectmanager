@@ -2,6 +2,7 @@ package com.pm.projectmanager.domain.project;
 
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_CREATE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_GET_SUCCESS;
+import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_UPDATE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_SIGNUP_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseUtils.of;
 
@@ -12,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pm.projectmanager.common.response.HttpResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateRequestDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
+import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
 import com.pm.projectmanager.domain.user.dto.SignupRequestDto;
 import com.pm.projectmanager.security.UserDetailsImpl;
 
@@ -56,5 +59,15 @@ public class ProjectController {
 	) {
 		List<ProjectResponseDto> responseDto = projectService.getAll(userDetails);
 		return of(PROJECT_GET_SUCCESS, responseDto);
+	}
+
+	@PutMapping("/{projectId}")
+	public ResponseEntity<HttpResponseDto> update(
+		@RequestBody ProjectUpdateDto requestDto,
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable Long projectId
+	) {
+		projectService.update(requestDto, userDetails, projectId);
+		return of(PROJECT_UPDATE_SUCCESS);
 	}
 }
