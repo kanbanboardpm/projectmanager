@@ -11,4 +11,6 @@ public interface AuthorityRepository extends JpaRepository<Authority, Long> {
 	boolean existsByProjectIdAndUserId(Long projectId, Long userId);
 
 	List<Authority> findByUserId(Long userId);
+
+	Authority findByProjectIdAndUserId(Long projectId, Long userId);
 }

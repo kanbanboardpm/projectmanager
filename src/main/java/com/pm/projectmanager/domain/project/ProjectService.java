@@ -76,4 +76,21 @@ public class ProjectService {
 
 		projectRepository.save(project);
 	}
+
+	@Transactional
+	public void delete(UserDetailsImpl userDetails, Long projectId) {
+
+		Project project = projectRepository.findById(projectId)
+			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
+
+		Authority authority = authorityRepository.findByProjectIdAndUserId(project.getId(), userDetails.getUser().getId());
+
+		if (authority == null) {
+			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
+		} else {
+			authorityRepository.delete(authority);
+			projectRepository.delete(project);
+		}
+	}
 }
+

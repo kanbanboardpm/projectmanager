@@ -1,6 +1,7 @@
 package com.pm.projectmanager.domain.project;
 
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_CREATE_SUCCESS;
+import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_DELETE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_GET_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_UPDATE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_SIGNUP_SUCCESS;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,5 +71,14 @@ public class ProjectController {
 	) {
 		projectService.update(requestDto, userDetails, projectId);
 		return of(PROJECT_UPDATE_SUCCESS);
+	}
+
+	@DeleteMapping("/{projectId}")
+	public ResponseEntity<HttpResponseDto> delete(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable Long projectId
+	) {
+		projectService.delete(userDetails, projectId);
+		return of(PROJECT_DELETE_SUCCESS);
 	}
 }
