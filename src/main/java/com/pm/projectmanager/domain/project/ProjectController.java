@@ -5,9 +5,12 @@ import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_GET
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_SIGNUP_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseUtils.of;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,12 +41,20 @@ public class ProjectController {
 		return of(PROJECT_CREATE_SUCCESS);
 	}
 
-	@GetMapping
+	@GetMapping("/{projectId}")
 	public ResponseEntity<HttpResponseDto> get(
-		@RequestParam Long projectId,
+		@PathVariable Long projectId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
 		ProjectResponseDto responseDto = projectService.get(projectId, userDetails);
+		return of(PROJECT_GET_SUCCESS, responseDto);
+	}
+
+	@GetMapping
+	public ResponseEntity<HttpResponseDto> getAll(
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		List<ProjectResponseDto> responseDto = projectService.getAll(userDetails);
 		return of(PROJECT_GET_SUCCESS, responseDto);
 	}
 }

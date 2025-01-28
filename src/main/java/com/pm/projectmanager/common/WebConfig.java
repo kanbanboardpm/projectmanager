@@ -15,7 +15,7 @@ public class WebConfig {
 			public void addCorsMappings(CorsRegistry registry) {
 				// 모든 경로에 대해 CORS 허용
 				registry.addMapping("/**")
-					.allowedOrigins("http://localhost:8080")
+					.allowedOrigins("http://43.201.146.41:8888") // 백엔드 AWS 주소
 					.allowedOrigins("http://localhost:5173")
 					.allowedMethods("*")
 					.allowedHeaders("*")

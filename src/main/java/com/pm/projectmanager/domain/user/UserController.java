@@ -12,6 +12,7 @@ import com.pm.projectmanager.domain.user.dto.SignupRequestDto;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_SIGNUP_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseUtils.of;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -23,7 +24,7 @@ public class UserController {
 
 	@PostMapping
 	public ResponseEntity<HttpResponseDto> signup(
-		@RequestBody SignupRequestDto requestDto
+		@Valid @RequestBody SignupRequestDto requestDto
 	) {
 		userService.signup(requestDto);
 		return of(USER_SIGNUP_SUCCESS);

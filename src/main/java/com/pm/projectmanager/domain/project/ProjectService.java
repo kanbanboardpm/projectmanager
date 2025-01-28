@@ -1,8 +1,12 @@
 package com.pm.projectmanager.domain.project;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
+import com.pm.projectmanager.domain.authority.Authority;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.authority.AuthorityService;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateRequestDto;
@@ -45,5 +49,14 @@ public class ProjectService {
 		}
 
 		return new ProjectResponseDto(project);
+	}
+
+	public List<ProjectResponseDto> getAll(UserDetailsImpl userDetails) {
+
+		List<Authority> authorities = authorityRepository.findByUserId(userDetails.getUser().getId());
+
+		return authorities.stream()
+			.map(authority -> new ProjectResponseDto(authority.getProject()))
+			.collect(Collectors.toList());
 	}
 }
