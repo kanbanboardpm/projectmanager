@@ -1,10 +1,11 @@
 package com.pm.projectmanager.domain.project;
 
+import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_ACCEPT_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_CREATE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_DELETE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_GET_SUCCESS;
+import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_INVITE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_UPDATE_SUCCESS;
-import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_SIGNUP_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseUtils.of;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pm.projectmanager.common.response.HttpResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateRequestDto;
+import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
 import com.pm.projectmanager.domain.user.dto.SignupRequestDto;
@@ -80,5 +82,24 @@ public class ProjectController {
 	) {
 		projectService.delete(userDetails, projectId);
 		return of(PROJECT_DELETE_SUCCESS);
+	}
+
+	@PostMapping("/invite/{projectId}")
+	public ResponseEntity<HttpResponseDto> invite(
+		@RequestBody ProjectInviteDto requestDto,
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable Long projectId
+	) {
+		projectService.invite(requestDto, userDetails, projectId);
+		return of(PROJECT_INVITE_SUCCESS);
+	}
+
+	@PostMapping("/accept/{projectId}")
+	public ResponseEntity<HttpResponseDto> accept(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable Long projectId
+	) {
+		projectService.inviteAccept(projectId, userDetails);
+		return of(PROJECT_ACCEPT_SUCCESS);
 	}
 }
