@@ -17,7 +17,9 @@ public enum ResponseCodeEnum {
 	PROJECT_INVITE_SUCCESS(HttpStatus.OK, "프로젝트 초대 성공"),
 	PROJECT_ACCEPT_SUCCESS(HttpStatus.OK, "프로젝트 수락 성공"),
     // category
-    CATEGORY_CREATE_SUCCESS(HttpStatus.OK, "카테고리 생성 성공");
+    CATEGORY_CREATE_SUCCESS(HttpStatus.OK, "카테고리 생성 성공"),
+    CATEGORY_SELECT_SUCCESS(HttpStatus.OK, "카테고리 조회 성공"),
+    CATEGORY_UPDATE_SUCCESS(HttpStatus.OK, "카테고리 수정 성공");
 
 	private final HttpStatus httpStatus;
 	private final String message;

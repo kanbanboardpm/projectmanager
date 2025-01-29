@@ -1,5 +1,7 @@
 package com.pm.projectmanager.domain.category;
 
+import com.pm.projectmanager.domain.project.Color;
+import com.pm.projectmanager.domain.project.Project;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -16,21 +18,27 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String color;
+    @Enumerated(EnumType.STRING)
+    private Color color;
+
     private String name;
     private String description;
-    private Long projectId;
+
+    @ManyToOne
+    @JoinColumn(name = "project_id", nullable = false)
+    private Project project;
 
     @Builder
-    public Category(String color, String name, String description, Long projectId) {
+    public Category(Color color, String name, String description, Project project) {
         this.color = color;
         this.name = name;
         this.description = description;
-        this.projectId = projectId;
+        this.project = project;
     }
 
-//    @ManyToOne
-//    @JoinColumn(name = "project_id", nullable = false)
-//    private Project project;
-
+    public void update(Color color, String name, String description) {
+        this.color = color;
+        this.name = name;
+        this.description = description;
+    }
 }
