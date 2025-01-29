@@ -38,7 +38,7 @@ public class UserController {
 	public ResponseEntity<HttpResponseDto> logout(
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
-		userService.logout(userDetails.getUser().getUsername());
+		userService.logout(userDetails.getUser().getEmail());
 		return of(USER_LOGOUT_SUCCESS);
 	}
 }
