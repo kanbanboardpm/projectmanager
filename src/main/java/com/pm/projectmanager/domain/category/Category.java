@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"project_Id", "name"}))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Category {
@@ -18,12 +19,14 @@ public class Category {
     private String color;
     private String name;
     private String description;
+    private Long projectId;
 
     @Builder
-    public Category(String color, String name, String description) {
+    public Category(String color, String name, String description, Long projectId) {
         this.color = color;
         this.name = name;
         this.description = description;
+        this.projectId = projectId;
     }
 
 //    @ManyToOne
