@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Email;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,7 +23,8 @@ public class User extends TimeStamp {
 	private Long id;
 
 	@Column(nullable = false, unique = true)
-	private String username;
+	@Email
+	private String email;
 
 	@Column(nullable = false)
 	private String password;
@@ -34,8 +36,8 @@ public class User extends TimeStamp {
 	private String photoUrl;
 
 	@Builder
-	public User(String username, String password, String nickname, String photoUrl) {
-		this.username = username;
+	public User(String email, String password, String nickname, String photoUrl) {
+		this.email = email;
 		this.password = password;
 		this.nickname = nickname;
 		this.photoUrl = photoUrl;

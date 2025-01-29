@@ -16,8 +16,7 @@ import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_LOGOUT
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_SIGNUP_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseUtils.of;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -29,7 +28,7 @@ public class UserController {
 
 	@PostMapping
 	public ResponseEntity<HttpResponseDto> signup(
-		@RequestBody SignupRequestDto requestDto
+		@Valid @RequestBody SignupRequestDto requestDto
 	) {
 		userService.signup(requestDto);
 		return of(USER_SIGNUP_SUCCESS);

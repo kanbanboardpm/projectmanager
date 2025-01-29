@@ -15,16 +15,28 @@ public class RedisService {
 
 	private final RedisTemplate<String, String> redisTemplate;
 	private final Long refreshTokenExpiration = 14 * 24 * 60 * 60 * 1000L; // 14일
+	private final Long inviteExpiration = 3 * 24 * 60 * 60 * 1000L; // 3일
 
 	@Transactional
-	public void saveRefreshToken(String username, String refreshToken) {
-		redisTemplate.opsForValue().set(username, refreshToken, refreshTokenExpiration, TimeUnit.MILLISECONDS);
+	public void saveRefreshToken(String email, String refreshToken) {
+		redisTemplate.opsForValue().set(email, refreshToken, refreshTokenExpiration, TimeUnit.MILLISECONDS);
 	}
 
 	public String getUsername(String username) {
 		return redisTemplate.opsForValue().get(username);
 	}
 
+	public void invite(String email, Long projectId) {
+		redisTemplate.opsForValue().set(inviteKey(email, projectId), "pending", inviteExpiration, TimeUnit.MILLISECONDS);
+	}
+
+	public boolean checkInvite(String email, Long projectId) {
+		return redisTemplate.hasKey("invite:" + email + ":" + projectId);
+	}
+
+	private String inviteKey(String email, Long projectId) {
+		return "invite:" + email + ":" + projectId;
+	}
 	public void delete(String email) {
 		redisTemplate.delete(email);
 	}
