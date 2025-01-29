@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         LoginRequestDto requestDto = new ObjectMapper().readValue(req.getInputStream(), LoginRequestDto.class);
         return getAuthenticationManager().authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        requestDto.getUsername(),
+                        requestDto.getEmail(),
                         requestDto.getPassword(),
                         null
                 )
@@ -57,14 +57,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res,
         FilterChain chain, Authentication authResult) throws IOException {
         log.info("인증 성공 및 JWT 생성");
-        String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
+        String email = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
 
-        String accessToken = jwtProvider.createAccessToken(username); // Set<UserRole> 전달
-        String refreshToken = jwtProvider.createRefreshToken(username);
+        String accessToken = jwtProvider.createAccessToken(email); // Set<UserRole> 전달
+        String refreshToken = jwtProvider.createRefreshToken(email);
 
         // res.setHeader(AUTHORIZATION_HEADER, accessToken); cookie 방식으로 변경
         jwtProvider.addJwtToCookie(accessToken, res);
-        redisService.saveRefreshToken(username, refreshToken);
+        redisService.saveRefreshToken(email, refreshToken);
 
         res.setStatus(SC_OK);
         res.setCharacterEncoding("UTF-8");
