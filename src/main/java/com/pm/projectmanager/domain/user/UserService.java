@@ -3,10 +3,14 @@ package com.pm.projectmanager.domain.user;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.user.dto.SignupRequestDto;
 import com.pm.projectmanager.exception.UserAlreadyExistsException;
+import com.pm.projectmanager.security.JwtProvider;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +20,7 @@ public class UserService {
 
 	private final PasswordEncoder passwordEncoder;
 	private final UserRepository userRepository;
+	private final RedisService redisService;
 
 	@Transactional
 	public void signup(SignupRequestDto requestDto) {
@@ -34,5 +39,9 @@ public class UserService {
 		User user = new User(requestDto.getUsername(), encodedPassword,
 			requestDto.getNickname(), imageUrl);
 		userRepository.save(user);
+	}
+
+	public void logout(String username) {
+		redisService.delete(username);
 	}
 }

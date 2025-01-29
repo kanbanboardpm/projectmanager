@@ -25,4 +25,7 @@ public class RedisService {
 		return redisTemplate.opsForValue().get(username);
 	}
 
+	public void delete(String email) {
+		redisTemplate.delete(email);
+	}
 }
