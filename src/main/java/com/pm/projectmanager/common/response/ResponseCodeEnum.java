@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ResponseCodeEnum {
 	USER_SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입 성공"),
+	USER_LOGOUT_SUCCESS(HttpStatus.OK, "로그아웃 성공"),
 	PROJECT_CREATE_SUCCESS(HttpStatus.CREATED, "프로젝트 생성 성공"),
 	PROJECT_GET_SUCCESS(HttpStatus.OK, "프로젝트 조회 성공"),
 	PROJECT_UPDATE_SUCCESS(HttpStatus.OK, "프로젝트 수정 성공"),
