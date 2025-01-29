@@ -17,6 +17,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.pm.projectmanager.common.RedisService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -27,6 +33,8 @@ public class WebSecurityConfig {
 	private final UserDetailsServiceImpl userDetailsService;
 	private final AuthenticationConfiguration authenticationConfiguration;
 	private final RedisService redisService;
+
+    private final String FRONTEND_DOMAIN = "http://localhost:5173";
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -51,10 +59,33 @@ public class WebSecurityConfig {
 		return new JwtAuthorizationFilter(jwtProvider, userDetailsService, redisService);
 	}
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        // 프론트엔드 URL만 허용
+        configuration.setAllowedOrigins(List.of(FRONTEND_DOMAIN));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+
+        // 노출할 헤더 설정
+        configuration.setExposedHeaders(List.of("Authorization"));
+
+        // 쿠키 및 자격 증명을 포함할지 여부 설정
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
+    }
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		// CSRF 설정
 		http.csrf(AbstractHttpConfigurer::disable);
+
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
 		// 기본 설정인 Session 방식은 사용하지 않고 JWT 방식을 사용하기 위한 설정
 		http.sessionManagement((sessionManagement) ->

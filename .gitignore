@@ -36,5 +36,11 @@ out/
 ### VS Code ###
 .vscode/
 
-#log
+### log ###
 /logs
+
+### env ###
+.env
+
+### logback-spring.xml ###
+src/main/resources/logback-spring.xml
