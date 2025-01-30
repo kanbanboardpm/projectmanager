@@ -1,12 +1,13 @@
 package com.pm.projectmanager.domain.category;
 
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
-import com.pm.projectmanager.domain.category.dto.CreateCategoryRequestDto;
-import com.pm.projectmanager.domain.category.dto.SelectCategoryRequestDto;
-import com.pm.projectmanager.domain.category.dto.SelectCategoryResponseDto;
-import com.pm.projectmanager.domain.category.dto.UpdateCategoryRequestDto;
+import com.pm.projectmanager.domain.authority.Authority;
+import com.pm.projectmanager.domain.authority.AuthorityRepository;
+import com.pm.projectmanager.domain.category.dto.*;
 import com.pm.projectmanager.domain.project.Project;
 import com.pm.projectmanager.domain.project.ProjectRepository;
+import com.pm.projectmanager.domain.user.User;
+import com.pm.projectmanager.exception.AuthorityNullException;
 import com.pm.projectmanager.exception.CategoryNameAlreadyExistsInProjectException;
 import com.pm.projectmanager.exception.CategoryNotFoundException;
 import com.pm.projectmanager.exception.ProjectNullException;
@@ -23,15 +24,16 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final ProjectRepository projectRepository;
+    private final AuthorityRepository authorityRepository;
 
     // 카테고리 생성
-    public void createCategory(CreateCategoryRequestDto requestDto) {
-        Project project = findByProjectId(requestDto.getProjectId());
+    public void createCategory(CreateCategoryRequestDto requestDto, User user) {
+        Authority authority = findByProjectIdAndUserId(requestDto.getProjectId(), user.getId());
         try {
             Category category = Category.builder().name(requestDto.getName())
                     .color(requestDto.getColor())
                     .description(requestDto.getDescription())
-                    .project(project).build();
+                    .project(authority.getProject()).build();
             categoryRepository.save(category);
         } catch (DataIntegrityViolationException e) {
             throw new CategoryNameAlreadyExistsInProjectException(
@@ -39,26 +41,41 @@ public class CategoryService {
         }
     }
 
-    public List<SelectCategoryResponseDto> selectAllCategory(SelectCategoryRequestDto requestDto) {
-        hasProject(requestDto.getProjectId());
+    // 카테고리 조회
+    public List<SelectCategoryResponseDto> selectAllCategory(SelectCategoryRequestDto requestDto, User user) {
+        hasProjectAndUser(requestDto.getProjectId(), user.getId());
         return categoryRepository.findAll().stream().map(SelectCategoryResponseDto::new).toList();
     }
 
+    // 카테고리 수정
     @Transactional
-    public void updateCategory(UpdateCategoryRequestDto requestDto) {
+    public void updateCategory(UpdateCategoryRequestDto requestDto, User user) {
+        hasProjectAndUser(requestDto.getProjectId(), user.getId());
         Category category = categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(
                 () -> new CategoryNotFoundException(ResponseExceptionEnum.CATEGORY_NOT_FOUND));
         category.update(requestDto.getColor(), requestDto.getName(), requestDto.getDescription());
     }
 
-    private Project findByProjectId(Long projectId) {
-        return projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
+    // 카테고리 삭제
+    public void deleteCategory(DeleteCategoryRequestDto requestDto, User user) {
+        hasProjectAndUser(requestDto.getProjectId(), user.getId());
+        Category category = categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(
+                () -> new CategoryNotFoundException(ResponseExceptionEnum.CATEGORY_NOT_FOUND));
+        categoryRepository.delete(category);
     }
 
-    private void hasProject(Long projectId) {
-        if(projectRepository.findById(projectId).isEmpty()) {
-            throw new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND);
+    private Authority findByProjectIdAndUserId(Long projectId, Long userId) {
+        Authority authority = authorityRepository.findByProjectIdAndUserId(projectId, userId);
+        if (authority == null) {
+            throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
+        }
+        return authority;
+    }
+
+    private void hasProjectAndUser(Long projectId, Long userId) {
+        Authority authority = authorityRepository.findByProjectIdAndUserId(projectId, userId);
+        if (authority == null) {
+            throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
         }
     }
 

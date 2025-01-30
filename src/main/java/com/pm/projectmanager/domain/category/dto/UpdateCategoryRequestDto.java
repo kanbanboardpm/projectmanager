@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class UpdateCategoryRequestDto {
+    private Long projectId;
     private Long categoryId;
     private String name;
     private String description;
