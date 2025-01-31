@@ -17,7 +17,6 @@ public class CardService {
 
     public void createCard(CreateCardRequestDto requestDto, User user) {
         hasProjectAndUser(requestDto.getProjectId(), user.getId());
-        Card card =
     }
 
     private Authority findByProjectIdAndUserId(Long projectId, Long userId) {
