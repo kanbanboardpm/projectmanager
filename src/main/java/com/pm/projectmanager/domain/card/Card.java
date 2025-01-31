@@ -4,6 +4,7 @@ import com.pm.projectmanager.domain.category.Category;
 import com.pm.projectmanager.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -35,4 +36,13 @@ public class Card {
 //    @ManyToOne
 //    @JoinColumn(name = "section_id", nullable = false)
 //    private Section section;
+
+    @Builder
+    public Card(String title, String content, LocalDateTime startDate, LocalDateTime endDate, LocalDateTime completeDate) {
+        this.title = title;
+        this.content = content;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.completeDate = completeDate;
+    }
 }

@@ -20,7 +20,9 @@ public enum ResponseCodeEnum {
     CATEGORY_CREATE_SUCCESS(HttpStatus.OK, "카테고리 생성 성공"),
     CATEGORY_SELECT_SUCCESS(HttpStatus.OK, "카테고리 조회 성공"),
     CATEGORY_UPDATE_SUCCESS(HttpStatus.OK, "카테고리 수정 성공"),
-    CATEGORY_DELETE_SUCCESS(HttpStatus.OK, "카테고리 삭제 성공");
+    CATEGORY_DELETE_SUCCESS(HttpStatus.OK, "카테고리 삭제 성공"),
+    //card
+    CARD_CREATE_SUCCESS(HttpStatus.OK, "z카드 생성 성공");
 
 	private final HttpStatus httpStatus;
 	private final String message;
