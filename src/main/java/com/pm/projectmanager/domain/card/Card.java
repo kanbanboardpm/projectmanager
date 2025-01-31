@@ -38,11 +38,20 @@ public class Card {
 //    private Section section;
 
     @Builder
-    public Card(String title, String content, LocalDateTime startDate, LocalDateTime endDate, LocalDateTime completeDate) {
+    public Card(String title,
+                String content,
+                LocalDateTime startDate,
+                LocalDateTime endDate,
+                LocalDateTime completeDate,
+                User user,
+                Category category)
+    {
         this.title = title;
         this.content = content;
         this.startDate = startDate;
         this.endDate = endDate;
         this.completeDate = completeDate;
+        this.user = user;
+        this.category = category;
     }
 }

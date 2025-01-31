@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 public class CreateCardRequestDto {
     private String title;
     private String content;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDateTime startDate; // ex) 2024-01-31T10:00:00
+    private LocalDateTime endDate; // ex) 2024-01-31T10:00:00
     private Long categoryId;
     private Long projectId;
 }
