@@ -5,6 +5,8 @@ import static com.pm.projectmanager.common.response.ResponseCodeEnum.SECTION_CRE
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.SECTION_GET_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseUtils.of;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,6 +51,15 @@ public class SectionController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
 		SectionResponseDto response = sectionService.get(sectionId, userDetails);
+		return of(SECTION_GET_SUCCESS, response);
+	}
+
+	@GetMapping()
+	public ResponseEntity<HttpResponseDto> getAll(
+		@PathVariable Long projectId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		List<SectionResponseDto> response = sectionService.getAll(projectId, userDetails);
 		return of(SECTION_GET_SUCCESS, response);
 	}
 }
