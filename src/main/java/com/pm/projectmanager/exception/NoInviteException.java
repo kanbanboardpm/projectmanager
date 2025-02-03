@@ -4,7 +4,7 @@ import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 
 public class NoInviteException extends CommonException {
 
-	public NoInviteException(ResponseExceptionEnum responseCodeEnum) {
-		super(responseCodeEnum);
+	public NoInviteException(ResponseExceptionEnum responseExceptionEnum) {
+		super(responseExceptionEnum);
 	}
 }

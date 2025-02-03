@@ -15,7 +15,9 @@ import com.pm.projectmanager.domain.project.Project;
 import com.pm.projectmanager.domain.project.ProjectRepository;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
 import com.pm.projectmanager.domain.section.dto.SectionCreateDto;
+import com.pm.projectmanager.domain.section.dto.SectionResponseDto;
 import com.pm.projectmanager.exception.ProjectNullException;
+import com.pm.projectmanager.exception.SectionNullException;
 import com.pm.projectmanager.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -40,4 +42,14 @@ public class SectionService {
 		sectionRepository.save(section);
 
 	}
+
+	public SectionResponseDto get(Long sectionId, UserDetailsImpl userDetails) {
+
+		Section section = sectionRepository.findById(sectionId)
+			.orElseThrow(() -> new SectionNullException(ResponseExceptionEnum.SECTION_NOT_FOUND));
+
+		return new SectionResponseDto(section);
+	}
+
+
 }
