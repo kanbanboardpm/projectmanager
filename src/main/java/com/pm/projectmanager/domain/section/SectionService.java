@@ -80,6 +80,15 @@ public class SectionService {
 		sectionRepository.save(section);
 	}
 
+	public void delete(Long projectId, Long sectionId, UserDetailsImpl userDetails) {
+		authorityCheck(projectId, userDetails);
+
+		Section section = sectionRepository.findById(sectionId)
+			.orElseThrow(() -> new SectionException(ResponseExceptionEnum.SECTION_NOT_FOUND));
+
+		sectionRepository.delete(section);
+	}
+
 	private void authorityCheck(Long projectId, UserDetailsImpl userDetails) {
 		if (!authorityRepository.existsByProjectIdAndUserId(projectId, userDetails.getUser().getId())) {
 			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);

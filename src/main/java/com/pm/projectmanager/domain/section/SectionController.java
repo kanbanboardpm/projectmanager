@@ -2,6 +2,7 @@ package com.pm.projectmanager.domain.section;
 
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_CREATE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.SECTION_CREATE_SUCCESS;
+import static com.pm.projectmanager.common.response.ResponseCodeEnum.SECTION_DELETE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.SECTION_GET_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.SECTION_UPDATE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseUtils.of;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -75,5 +77,15 @@ public class SectionController {
 	) {
 		sectionService.update(projectId, sectionId, requestDto, userDetails);
 		return of(SECTION_UPDATE_SUCCESS);
+	}
+
+	@DeleteMapping("/{sectionId}")
+	public ResponseEntity<HttpResponseDto> delete(
+		@PathVariable Long projectId,
+		@PathVariable Long sectionId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		sectionService.delete(projectId, sectionId, userDetails);
+		return of(SECTION_DELETE_SUCCESS);
 	}
 }
