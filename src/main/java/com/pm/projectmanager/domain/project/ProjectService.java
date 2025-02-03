@@ -3,7 +3,6 @@ package com.pm.projectmanager.domain.project;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.pm.projectmanager.common.RedisService;
@@ -11,7 +10,7 @@ import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.authority.Authority;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.authority.AuthorityService;
-import com.pm.projectmanager.domain.project.dto.ProjectCreateRequestDto;
+import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
@@ -33,7 +32,7 @@ public class ProjectService {
 	private final RedisService redisService;
 
 	@Transactional
-	public void create(ProjectCreateRequestDto requestDto, UserDetailsImpl userDetails) {
+	public void create(ProjectCreateDto requestDto, UserDetailsImpl userDetails) {
 
 		Project project = Project.builder()
 			.name(requestDto.getName())
