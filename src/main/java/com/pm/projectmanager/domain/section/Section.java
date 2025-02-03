@@ -35,4 +35,8 @@ public class Section {
 		this.name = name;
 		this.project = project;
 	}
+
+	public void update(String name) {
+		this.name = name;
+	}
 }
