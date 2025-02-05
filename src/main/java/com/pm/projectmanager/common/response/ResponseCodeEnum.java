@@ -30,7 +30,8 @@ public enum ResponseCodeEnum {
 	SECTION_DELETE_SUCCESS(HttpStatus.OK, "섹션 삭제 성공"),
     //card
     CARD_CREATE_SUCCESS(HttpStatus.OK, "카드 생성 성공"),
-    CARD_SELECT_ALL_SUCCESS(HttpStatus.OK, "카드 전체 조회 성공");
+    CARD_SELECT_ALL_SUCCESS(HttpStatus.OK, "카드 전체 조회 성공"),
+    CARD_SELECT_SUCCESS(HttpStatus.OK, "섹션에 해당하는 카드 조회 성공");
 
 	private final HttpStatus httpStatus;
 	private final String message;

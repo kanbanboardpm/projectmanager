@@ -8,4 +8,5 @@ import java.util.List;
 @Repository
 public interface CardRepository extends JpaRepository<Card, Long> {
     List<Card> findAllByCompleteDateIsNull();
+    List<Card> findAllBySectionId(Long sectionId);
 }

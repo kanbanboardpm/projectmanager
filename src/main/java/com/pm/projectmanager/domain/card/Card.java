@@ -1,6 +1,7 @@
 package com.pm.projectmanager.domain.card;
 
 import com.pm.projectmanager.domain.category.Category;
+import com.pm.projectmanager.domain.section.Section;
 import com.pm.projectmanager.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -33,9 +34,9 @@ public class Card {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-//    @ManyToOne
-//    @JoinColumn(name = "section_id", nullable = false)
-//    private Section section;
+    @ManyToOne
+    @JoinColumn(name = "section_id", nullable = false)
+    private Section section;
 
     @Builder
     public Card(String title,
@@ -44,7 +45,8 @@ public class Card {
                 LocalDateTime endDate,
                 LocalDateTime completeDate,
                 User user,
-                Category category)
+                Category category,
+                Section section)
     {
         this.title = title;
         this.content = content;
@@ -53,5 +55,6 @@ public class Card {
         this.completeDate = completeDate;
         this.user = user;
         this.category = category;
+        this.section = section;
     }
 }

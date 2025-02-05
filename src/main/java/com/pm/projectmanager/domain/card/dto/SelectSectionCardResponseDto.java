@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class SelectAllCardResponseDto {
+public class SelectSectionCardResponseDto {
     private final Long cardId;
     private final Long sectionId;
     private final String title;
@@ -19,7 +19,7 @@ public class SelectAllCardResponseDto {
     private final String nickName;
     private final String photoUrl;
 
-    public SelectAllCardResponseDto(Card card) {
+    public SelectSectionCardResponseDto(Card card) {
         this.cardId = card.getId();
         this.sectionId = card.getSection().getId();
         this.title = card.getTitle();

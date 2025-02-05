@@ -12,4 +12,5 @@ public class CreateCardRequestDto {
     private LocalDateTime endDate; // ex) 2024-01-31T10:00:00
     private Long categoryId;
     private Long projectId;
+    private Long sectionId;
 }
