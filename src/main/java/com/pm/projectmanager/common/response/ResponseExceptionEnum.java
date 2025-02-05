@@ -20,7 +20,9 @@ public enum ResponseExceptionEnum {
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
 	// section
 	SECTION_NOT_FOUND(HttpStatus.NOT_FOUND, "섹션을 찾을 수 없습니다."),
-	SECTION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "중복된 섹션명입니다.");
+	SECTION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "중복된 섹션명입니다."),
+    // card
+    CARD_NOT_FOUND(HttpStatus.NOT_FOUND, "카드를 찾을 수 없습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;

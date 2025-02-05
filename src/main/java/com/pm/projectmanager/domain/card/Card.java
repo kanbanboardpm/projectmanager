@@ -1,5 +1,6 @@
 package com.pm.projectmanager.domain.card;
 
+import com.pm.projectmanager.domain.card.dto.UpdateCardRequestDto;
 import com.pm.projectmanager.domain.category.Category;
 import com.pm.projectmanager.domain.section.Section;
 import com.pm.projectmanager.domain.user.User;
@@ -56,5 +57,13 @@ public class Card {
         this.user = user;
         this.category = category;
         this.section = section;
+    }
+
+    public void update(UpdateCardRequestDto requestDto, Category category) {
+        this.title = requestDto.getTitle();
+        this.content = requestDto.getContent();
+        this.startDate = requestDto.getStartDate();
+        this.endDate = requestDto.getEndDate();
+        this.category = category;
     }
 }

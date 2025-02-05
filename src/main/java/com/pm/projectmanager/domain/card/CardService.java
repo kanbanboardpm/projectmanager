@@ -6,17 +6,14 @@ import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.card.dto.*;
 import com.pm.projectmanager.domain.category.Category;
 import com.pm.projectmanager.domain.category.CategoryRepository;
-import com.pm.projectmanager.domain.project.Project;
 import com.pm.projectmanager.domain.project.ProjectRepository;
 import com.pm.projectmanager.domain.section.Section;
 import com.pm.projectmanager.domain.section.SectionRepository;
 import com.pm.projectmanager.domain.user.User;
-import com.pm.projectmanager.exception.AuthorityNullException;
-import com.pm.projectmanager.exception.CategoryNotFoundException;
-import com.pm.projectmanager.exception.ProjectNullException;
-import com.pm.projectmanager.exception.SectionException;
+import com.pm.projectmanager.exception.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -62,6 +59,17 @@ public class CardService {
         return cardRepository.findAllBySectionId(requestDto.getSectionId()).stream().map(SelectSectionCardResponseDto::new).toList();
     }
 
+    @Transactional
+    public void updateCard(UpdateCardRequestDto requestDto, User user, Long cardId) {
+        Card card = cardRepository.findByIdAndUserId(cardId, user.getId()).orElseThrow(
+                () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
+        );
+        Category category = categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(
+                () -> new CategoryNotFoundException(ResponseExceptionEnum.CATEGORY_NOT_FOUND)
+        );
+        card.update(requestDto, category);
+    }
+
     private Authority findByProjectIdAndUserId(Long projectId, Long userId) {
         Authority authority = authorityRepository.findByProjectIdAndUserId(projectId, userId);
         if (authority == null) {
@@ -92,4 +100,6 @@ public class CardService {
             throw new SectionException(ResponseExceptionEnum.SECTION_NOT_FOUND);
         }
     }
+
+
 }
