@@ -27,7 +27,14 @@ public enum ResponseCodeEnum {
 	SECTION_CREATE_SUCCESS(HttpStatus.CREATED, "섹션 생성 성공"),
 	SECTION_GET_SUCCESS(HttpStatus.OK, "섹션 조회 성공"),
 	SECTION_UPDATE_SUCCESS(HttpStatus.OK, "섹션 수정 성공"),
-	SECTION_DELETE_SUCCESS(HttpStatus.OK, "섹션 삭제 성공");
+	SECTION_DELETE_SUCCESS(HttpStatus.OK, "섹션 삭제 성공"),
+    //card
+    CARD_CREATE_SUCCESS(HttpStatus.OK, "카드 생성 성공"),
+    CARD_SELECT_ALL_SUCCESS(HttpStatus.OK, "카드 전체 조회 성공"),
+    CARD_SELECT_SUCCESS(HttpStatus.OK, "섹션에 해당하는 카드 조회 성공"),
+    CARD_UPDATE_SUCCESS(HttpStatus.OK, "카드 수정 성공"),
+    CARD_DELETE_SUCCESS(HttpStatus.OK, "카드 삭제 성공"),
+    CARD_SELECT_DETAIL_SUCCESS(HttpStatus.OK, "카드 상세 조회 성공");
 
 	private final HttpStatus httpStatus;
 	private final String message;
