@@ -60,4 +60,14 @@ public class CardController {
         return of(CARD_UPDATE_SUCCESS);
     }
 
+    @DeleteMapping("/{cardId}")
+    public ResponseEntity<HttpResponseDto> deleteCard(
+            @PathVariable Long cardId,
+            @RequestBody DeleteCardRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails)
+    {
+        cardService.deleteCard(requestDto, userDetails.getUser(), cardId);
+        return of(CARD_DELETE_SUCCESS);
+    }
+
 }
