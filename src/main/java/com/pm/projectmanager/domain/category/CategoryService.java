@@ -4,13 +4,10 @@ import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.authority.Authority;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.category.dto.*;
-import com.pm.projectmanager.domain.project.Project;
-import com.pm.projectmanager.domain.project.ProjectRepository;
 import com.pm.projectmanager.domain.user.User;
 import com.pm.projectmanager.exception.AuthorityNullException;
 import com.pm.projectmanager.exception.CategoryNameAlreadyExistsInProjectException;
 import com.pm.projectmanager.exception.CategoryNotFoundException;
-import com.pm.projectmanager.exception.ProjectNullException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,7 +20,6 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final ProjectRepository projectRepository;
     private final AuthorityRepository authorityRepository;
 
     // 카테고리 생성

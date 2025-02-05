@@ -3,6 +3,11 @@ package com.pm.projectmanager.domain.project;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.pm.projectmanager.domain.category.CategoryService;
+import com.pm.projectmanager.domain.category.dto.CreateCategoryRequestDto;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +36,7 @@ public class ProjectService {
 	private final AuthorityService authorityService;
 	private final AuthorityRepository authorityRepository;
 	private final RedisService redisService;
+    private final CategoryService categoryService;
 
 	@Transactional
 	public void create(ProjectCreateRequestDto requestDto, UserDetailsImpl userDetails) {
@@ -43,6 +49,16 @@ public class ProjectService {
 		projectRepository.save(project);
 
 		authorityService.create(project, userDetails.getUser());
+
+        Color color = Color.DEFAULT;
+        String categoryName = "default";
+        String categoryDescription = "카테고리를 새로 생성해 주세요.";
+        categoryService.createCategory(new CreateCategoryRequestDto(
+                        color,
+                        categoryName,
+                        categoryDescription,
+                        project.getId()),
+                        userDetails.getUser());
 	}
 
 	public ProjectResponseDto get(Long projectId, UserDetailsImpl userDetails) {
