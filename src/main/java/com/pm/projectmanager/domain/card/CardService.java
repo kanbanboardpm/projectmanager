@@ -60,6 +60,15 @@ public class CardService {
         return cardRepository.findAllBySectionId(requestDto.getSectionId()).stream().map(SelectSectionCardResponseDto::new).toList();
     }
 
+    public GetCardDetailResponseDto getCardDetail(GetCardDetailRequestDto requestDto, User user, Long cardId) {
+        validateUserInProject(requestDto.getProjectId(), user.getId());
+        hasSection(requestDto.getSectionId());
+        Card card = cardRepository.findById(cardId).orElseThrow(
+                () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
+        );
+        return new GetCardDetailResponseDto(card);
+    }
+
     @Transactional
     public void updateCard(UpdateCardRequestDto requestDto, User user, Long cardId) {
         Card card = cardRepository.findByIdAndUserId(cardId, user.getId()).orElseThrow(
@@ -109,7 +118,4 @@ public class CardService {
             throw new SectionException(ResponseExceptionEnum.SECTION_NOT_FOUND);
         }
     }
-
-
-
 }

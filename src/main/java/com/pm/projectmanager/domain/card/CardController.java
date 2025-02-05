@@ -50,6 +50,16 @@ public class CardController {
         return of(CARD_SELECT_SUCCESS, responseDto);
     }
 
+    @GetMapping("/{cardId}")
+    public ResponseEntity<HttpResponseDto> getCardDetail(
+            @PathVariable Long cardId,
+            @RequestBody GetCardDetailRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails)
+    {
+        GetCardDetailResponseDto responseDto = cardService.getCardDetail(requestDto, userDetails.getUser(), cardId);
+        return of(CARD_SELECT_DETAIL_SUCCESS, responseDto);
+    }
+
     @PutMapping("/{cardId}")
     public ResponseEntity<HttpResponseDto> updateCard(
             @PathVariable Long cardId,
