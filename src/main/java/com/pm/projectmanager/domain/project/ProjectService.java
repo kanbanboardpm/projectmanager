@@ -16,7 +16,7 @@ import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.authority.Authority;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.authority.AuthorityService;
-import com.pm.projectmanager.domain.project.dto.ProjectCreateRequestDto;
+import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
@@ -39,7 +39,7 @@ public class ProjectService {
     private final CategoryService categoryService;
 
 	@Transactional
-	public void create(ProjectCreateRequestDto requestDto, UserDetailsImpl userDetails) {
+	public void create(ProjectCreateDto requestDto, UserDetailsImpl userDetails) {
 
 		Project project = Project.builder()
 			.name(requestDto.getName())
@@ -66,9 +66,7 @@ public class ProjectService {
 		Project project = projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
 
-		if (!authorityRepository.existsByProjectIdAndUserId(projectId, userDetails.getUser().getId())) {
-			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
-		}
+		authorityCheck(projectId, userDetails);
 
 		return new ProjectResponseDto(project);
 	}
@@ -88,9 +86,7 @@ public class ProjectService {
 		Project project = projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
 
-		if (!authorityRepository.existsByProjectIdAndUserId(projectId, userDetails.getUser().getId())) {
-			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
-		}
+		authorityCheck(projectId, userDetails);
 
 		project.updateName(requestDto.getName());
 		project.updateColor(requestDto.getColor());
@@ -106,12 +102,11 @@ public class ProjectService {
 
 		Authority authority = authorityRepository.findByProjectIdAndUserId(project.getId(), userDetails.getUser().getId());
 
-		if (authority == null) {
-			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
-		} else {
-			authorityRepository.delete(authority);
-			projectRepository.delete(project);
-		}
+		authorityCheck(projectId, userDetails);
+
+		authorityRepository.delete(authority);
+		projectRepository.delete(project);
+
 	}
 
 	@Transactional
@@ -119,15 +114,15 @@ public class ProjectService {
 		projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
 
-		if (!authorityRepository.existsByProjectIdAndUserId(projectId, userDetails.getUser().getId())) {
-			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
-		}
+		authorityCheck(projectId, userDetails);
 
 		inviteCreate(projectId, requestDto.getEmail());
 	}
 
 	@Transactional
 	public void inviteAccept(Long projectId, UserDetailsImpl userDetails) {
+		authorityCheck(projectId, userDetails);
+
 		if (redisService.checkInvite(userDetails.getUser().getEmail(), projectId)) {
 			Project project = projectRepository.findById(projectId)
 				.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
@@ -141,6 +136,12 @@ public class ProjectService {
 	private void inviteCreate(Long projectId, String email) {
 		redisService.invite(email, projectId);
 
+	}
+
+	private void authorityCheck(Long projectId, UserDetailsImpl userDetails) {
+		if (!authorityRepository.existsByProjectIdAndUserId(projectId, userDetails.getUser().getId())) {
+			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
+		}
 	}
 }
 

@@ -19,15 +19,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pm.projectmanager.common.response.HttpResponseDto;
-import com.pm.projectmanager.domain.project.dto.ProjectCreateRequestDto;
+import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
-import com.pm.projectmanager.domain.user.dto.SignupRequestDto;
 import com.pm.projectmanager.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -41,7 +39,7 @@ public class ProjectController {
 
 	@PostMapping
 	public ResponseEntity<HttpResponseDto> create(
-		@RequestBody ProjectCreateRequestDto requestDto,
+		@RequestBody ProjectCreateDto requestDto,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
 		projectService.create(requestDto, userDetails);
