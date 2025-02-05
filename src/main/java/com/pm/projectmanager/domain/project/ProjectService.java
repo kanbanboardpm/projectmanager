@@ -3,6 +3,7 @@ package com.pm.projectmanager.domain.project;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.pm.projectmanager.common.Color;
 import com.pm.projectmanager.domain.category.CategoryService;
 import com.pm.projectmanager.domain.category.dto.CreateCategoryRequestDto;
 import jakarta.validation.constraints.NotBlank;

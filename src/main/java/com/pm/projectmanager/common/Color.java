@@ -13,7 +13,8 @@ public enum Color {
 	OLIVE("#9E9D24"),
 	RED("#DB4437"),
 	BLUE("#4285F4"),
-	GREEN("#0D9D58");
+	GREEN("#0D9D58"),
+	DEFAULT("#E1E3E5");
 
 	private final String hexCode;
 

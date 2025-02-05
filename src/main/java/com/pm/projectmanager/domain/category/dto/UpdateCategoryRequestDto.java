@@ -1,6 +1,7 @@
 package com.pm.projectmanager.domain.category.dto;
 
-import com.pm.projectmanager.domain.project.Color;
+import com.pm.projectmanager.common.Color;
+
 import lombok.Getter;
 
 @Getter
