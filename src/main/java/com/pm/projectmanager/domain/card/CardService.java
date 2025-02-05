@@ -11,7 +11,6 @@ import com.pm.projectmanager.domain.section.Section;
 import com.pm.projectmanager.domain.section.SectionRepository;
 import com.pm.projectmanager.domain.user.User;
 import com.pm.projectmanager.exception.*;
-import com.pm.projectmanager.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,14 +85,6 @@ public class CardService {
                 () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
         );
         cardRepository.delete(card);
-    }
-
-    private Authority findByProjectIdAndUserId(Long projectId, Long userId) {
-        Authority authority = authorityRepository.findByProjectIdAndUserId(projectId, userId);
-        if (authority == null) {
-            throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
-        }
-        return authority;
     }
 
     // 프로젝트에 유저가 속해있는지 여부 검증
