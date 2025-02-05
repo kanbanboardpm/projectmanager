@@ -4,8 +4,8 @@ import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 
 public class UserAlreadyExistsException extends CommonException {
 
-	public UserAlreadyExistsException(ResponseExceptionEnum responseCodeEnum) {
-		super(responseCodeEnum);
+	public UserAlreadyExistsException(ResponseExceptionEnum responseExceptionEnum) {
+		super(responseExceptionEnum);
 	}
 
 }

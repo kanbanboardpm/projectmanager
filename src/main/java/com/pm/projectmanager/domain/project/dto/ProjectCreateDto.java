@@ -1,15 +1,13 @@
 package com.pm.projectmanager.domain.project.dto;
 
-import java.awt.*;
-
-import com.pm.projectmanager.domain.project.Color;
+import com.pm.projectmanager.common.Color;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ProjectCreateRequestDto {
+public class ProjectCreateDto {
 
 	private String name;
 	private Color color;
