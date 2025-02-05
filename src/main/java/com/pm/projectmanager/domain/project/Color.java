@@ -15,7 +15,8 @@ public enum Color {
 	ORANGE("#FF7043"),
 	KHAKI("#9E9D24"),
 	INDIGO("#5C6BC0"),
-	PINK("#F06292");
+	PINK("#F06292"),
+    DEFAULT("#E1E3E5");
 
 	private final String hexCode;
 
