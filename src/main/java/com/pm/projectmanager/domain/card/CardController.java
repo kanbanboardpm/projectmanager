@@ -50,6 +50,7 @@ public class CardController {
         return of(CARD_SELECT_SUCCESS, responseDto);
     }
 
+    // 카드 상세 조회
     @GetMapping("/{cardId}")
     public ResponseEntity<HttpResponseDto> getCardDetail(
             @PathVariable Long cardId,
