@@ -2,7 +2,7 @@
 name: "[Feature] XXX 기능 추가"
 about: 새로운 기능 추가 이슈
 title: "[Feature] XXX 기능 추가"
-labels: ''
+labels: feature
 assignees: ''
 
 ---
