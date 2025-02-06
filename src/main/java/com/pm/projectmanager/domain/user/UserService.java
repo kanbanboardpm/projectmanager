@@ -5,9 +5,15 @@ import org.springframework.stereotype.Service;
 
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
+import com.pm.projectmanager.domain.authority.AuthorityRepository;
+import com.pm.projectmanager.domain.dto.UpdateRequestDto;
 import com.pm.projectmanager.domain.user.dto.SignupRequestDto;
+import com.pm.projectmanager.domain.user.dto.UserResponseDto;
+import com.pm.projectmanager.domain.user.dto.WithdrawRequestDto;
+import com.pm.projectmanager.exception.PasswordIncorrectException;
 import com.pm.projectmanager.exception.UserAlreadyExistsException;
 import com.pm.projectmanager.security.JwtProvider;
+import com.pm.projectmanager.security.UserDetailsImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,6 +27,7 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 	private final UserRepository userRepository;
 	private final RedisService redisService;
+	private final AuthorityRepository authorityRepository;
 
 	@Transactional
 	public void signup(SignupRequestDto requestDto) {
@@ -43,5 +50,36 @@ public class UserService {
 
 	public void logout(String username) {
 		redisService.delete(username);
+	}
+
+	@Transactional
+	public void update(UpdateRequestDto requestDto, UserDetailsImpl userDetails) {
+
+		if (userRepository.existsByNickname(requestDto.getNickname())) {
+			throw new UserAlreadyExistsException(ResponseExceptionEnum.NICKNAME_ALREADY_EXISTS);
+		}
+
+		String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
+
+		User user = userDetails.getUser();
+		user.update(encodedPassword, requestDto.getNickname(), requestDto.getImage_url());
+		userRepository.save(user);
+	}
+
+	@Transactional
+	public void withdraw(WithdrawRequestDto requestDto, UserDetailsImpl userDetails) {
+
+		String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
+		if (passwordEncoder.matches(requestDto.getPassword(), encodedPassword)) {
+			authorityRepository.deleteByUserId(userDetails.getUser().getId());
+			userRepository.delete(userDetails.getUser());
+		} else {
+			throw new PasswordIncorrectException(ResponseExceptionEnum.PASSWORD_INCORRECT);
+		}
+	}
+
+	public UserResponseDto get(UserDetailsImpl userDetails) {
+		User user = userDetails.getUser();
+		return new UserResponseDto(user);
 	}
 }
