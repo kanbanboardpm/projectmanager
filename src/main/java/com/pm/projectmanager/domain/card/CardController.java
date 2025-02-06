@@ -61,6 +61,7 @@ public class CardController {
         return of(CARD_SELECT_DETAIL_SUCCESS, responseDto);
     }
 
+    // 카드 수정
     @PutMapping("/{cardId}")
     public ResponseEntity<HttpResponseDto> updateCard(
             @PathVariable Long cardId,
