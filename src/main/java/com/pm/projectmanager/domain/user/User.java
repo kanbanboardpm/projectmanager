@@ -42,4 +42,10 @@ public class User extends TimeStamp {
 		this.nickname = nickname;
 		this.photoUrl = photoUrl;
 	}
+
+	public void update(String password, String nickname, String photoUrl) {
+		this.password = password;
+		this.nickname = nickname;
+		this.photoUrl = photoUrl;
+	}
 }

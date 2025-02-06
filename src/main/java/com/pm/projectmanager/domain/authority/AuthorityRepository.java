@@ -13,4 +13,6 @@ public interface AuthorityRepository extends JpaRepository<Authority, Long> {
 	List<Authority> findByUserId(Long userId);
 
 	Authority findByProjectIdAndUserId(Long projectId, Long userId);
+
+	void deleteByUserId(Long id);
 }

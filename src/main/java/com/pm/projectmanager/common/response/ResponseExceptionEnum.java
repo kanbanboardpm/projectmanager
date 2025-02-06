@@ -11,6 +11,7 @@ public enum ResponseExceptionEnum {
 	// user
 	EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "중복된 이메일입니다."),
 	NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "중복된 닉네임입니다."),
+	PASSWORD_INCORRECT(HttpStatus.BAD_REQUEST, "패스워드가 일치하지 않습니다."),
 	// project
 	PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다."),
 	AUTHORITY_NULL_EXCEPTION(HttpStatus.FORBIDDEN, "해당 프로젝트에 권한이 없습니다."),
