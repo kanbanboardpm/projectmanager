@@ -62,8 +62,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String accessToken = jwtProvider.createAccessToken(email); // Set<UserRole> 전달
         String refreshToken = jwtProvider.createRefreshToken(email);
 
-        // res.setHeader(AUTHORIZATION_HEADER, accessToken); cookie 방식으로 변경
-        jwtProvider.addJwtToCookie(accessToken, res);
+        res.setHeader(AUTHORIZATION_HEADER, accessToken);
+        // jwtProvider.addJwtToCookie(accessToken, res);
         redisService.saveRefreshToken(email, refreshToken);
 
         res.setStatus(SC_OK);
