@@ -6,10 +6,6 @@ import java.util.stream.Collectors;
 import com.pm.projectmanager.common.Color;
 import com.pm.projectmanager.domain.category.CategoryService;
 import com.pm.projectmanager.domain.category.dto.CreateCategoryRequestDto;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.pm.projectmanager.common.RedisService;

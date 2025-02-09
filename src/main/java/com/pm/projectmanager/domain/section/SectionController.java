@@ -1,6 +1,5 @@
 package com.pm.projectmanager.domain.section;
 
-import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_CREATE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.SECTION_CREATE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.SECTION_DELETE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.SECTION_GET_SUCCESS;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,9 +25,6 @@ import com.pm.projectmanager.domain.section.dto.SectionResponseDto;
 import com.pm.projectmanager.domain.section.dto.SectionUpdateDto;
 import com.pm.projectmanager.security.UserDetailsImpl;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.RequiredArgsConstructor;
 
 @RestController

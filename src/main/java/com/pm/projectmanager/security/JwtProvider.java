@@ -173,7 +173,7 @@ public class JwtProvider {
 
 			Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);
 			cookie.setPath("/");
-
+            res.setHeader(AUTHORIZATION_HEADER, token);
 			res.addCookie(cookie);
 		} catch (UnsupportedEncodingException e) {
 			System.out.println("error");
