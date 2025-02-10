@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -65,5 +66,13 @@ public class Card {
         this.startDate = requestDto.getStartDate();
         this.endDate = requestDto.getEndDate();
         this.category = category;
+    }
+
+    public Optional<LocalDateTime> optionalCompleteDate() {
+        return Optional.ofNullable(completeDate);
+    }
+
+    public void complete(LocalDateTime completeDate) {
+        this.completeDate = completeDate;
     }
 }

@@ -72,6 +72,7 @@ public class CardController {
         return of(CARD_UPDATE_SUCCESS);
     }
 
+
     @DeleteMapping("/{cardId}")
     public ResponseEntity<HttpResponseDto> deleteCard(
             @PathVariable Long cardId,
@@ -80,6 +81,23 @@ public class CardController {
     {
         cardService.deleteCard(requestDto, userDetails.getUser(), cardId);
         return of(CARD_DELETE_SUCCESS);
+    }
+
+    /**
+     * < Card 완료 기능 >
+     * @param cardId : api -> 카드번호
+     * @param requestDto : 요청 request 데이터(완료일)
+     * @param userDetails : 현재 요청을 보내는 유저의 대한 정보
+     * @return : 카드 성공 -> 상태 코드 및 상태 메시지 리턴
+     */
+    @PostMapping("/{cardId}")
+    public ResponseEntity<HttpResponseDto> completeCard(
+            @PathVariable Long cardId,
+            @RequestBody CompleteCardRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails)
+    {
+        cardService.completeCard(requestDto, userDetails.getUser(), cardId);
+        return of(CARD_COMPLETE_SUCCESS);
     }
 
 }
