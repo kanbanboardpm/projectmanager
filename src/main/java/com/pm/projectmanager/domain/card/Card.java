@@ -66,4 +66,8 @@ public class Card {
         this.endDate = requestDto.getEndDate();
         this.category = category;
     }
+
+    public void updateCompleteDate(LocalDateTime completeDate) {
+        this.completeDate = completeDate;
+    }
 }

@@ -72,6 +72,7 @@ public class CardController {
         return of(CARD_UPDATE_SUCCESS);
     }
 
+
     @DeleteMapping("/{cardId}")
     public ResponseEntity<HttpResponseDto> deleteCard(
             @PathVariable Long cardId,
@@ -82,18 +83,20 @@ public class CardController {
         return of(CARD_DELETE_SUCCESS);
     }
 
+    /**
+     * < Card 완료 기능 >
+     * @param cardId : api -> 카드번호
+     * @param requestDto : 요청 request 데이터(완료일)
+     * @param userDetails : 현재 요청을 보내는 유저의 대한 정보
+     * @return : 카드 성공 -> 상태 코드 및 상태 메시지 리턴
+     */
     @PostMapping("/{cardId}")
     public ResponseEntity<HttpResponseDto> completeCard(
             @PathVariable Long cardId,
             @RequestBody CompleteCardRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails)
     {
-        // 카드 완료는 본인의 카드만 완료를 해야됨,
-        // 즉, 본인의 카드일 경우니까 해당 카드의 주인이 자신인지 accesstoken의 userId를 통해 검증해야함.
-        // cardId와 userId가 일치하는 경우에만 완료로 넣어줘야함.
-        // 1. cardId로 카드를 조회한 후 거기에 있는 userId가 현재 userId랑 같은지
-        // 2. cardId + userId를 조건으로 조회 후 값이 있으면 완료로 해주던가
-        // 둘 중 하나 -> 2번이 좀 더 나은듯. 2번을 통해 조회 되면 거기에 받아온 날짜를 넣어주면 완료!
+        cardService.completeCard(requestDto, userDetails.getUser(), cardId);
         return of(CARD_COMPLETE_SUCCESS);
     }
 

@@ -87,6 +87,15 @@ public class CardService {
         cardRepository.delete(card);
     }
 
+    // 카드 완료
+    @Transactional
+    public void completeCard(CompleteCardRequestDto requestDto, User user, Long cardId) {
+        Card card = cardRepository.findByIdAndUserId(cardId, user.getId()).orElseThrow(
+                () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
+        );
+        card.updateCompleteDate(requestDto.getCompleteDate());
+    }
+
     // 프로젝트에 유저가 속해있는지 여부 검증
     private void validateUserInProject(Long projectId, Long userId) {
         hasProject(projectId);
@@ -109,4 +118,6 @@ public class CardService {
             throw new SectionException(ResponseExceptionEnum.SECTION_NOT_FOUND);
         }
     }
+
+
 }
