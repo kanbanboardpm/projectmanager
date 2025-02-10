@@ -93,7 +93,10 @@ public class CardService {
         Card card = cardRepository.findByIdAndUserId(cardId, user.getId()).orElseThrow(
                 () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
         );
-        card.updateCompleteDate(requestDto.getCompleteDate());
+        card.optionalCompleteDate().ifPresent(date -> {
+            throw new CardAlreadyCompletedException(ResponseExceptionEnum.CARD_ALREADY_COMPLETED);
+        });
+        card.complete(requestDto.getCompleteDate());
     }
 
     // 프로젝트에 유저가 속해있는지 여부 검증

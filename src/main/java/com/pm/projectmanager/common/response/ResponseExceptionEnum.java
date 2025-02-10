@@ -23,7 +23,8 @@ public enum ResponseExceptionEnum {
 	SECTION_NOT_FOUND(HttpStatus.NOT_FOUND, "섹션을 찾을 수 없습니다."),
 	SECTION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "중복된 섹션명입니다."),
     // card
-    CARD_NOT_FOUND(HttpStatus.NOT_FOUND, "카드를 찾을 수 없습니다.");
+    CARD_NOT_FOUND(HttpStatus.NOT_FOUND, "카드를 찾을 수 없습니다."),
+    CARD_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "이미 완료 된 카드 입니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;
