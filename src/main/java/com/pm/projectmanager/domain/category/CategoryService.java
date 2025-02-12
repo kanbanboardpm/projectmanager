@@ -38,8 +38,8 @@ public class CategoryService {
     }
 
     // 카테고리 조회
-    public List<SelectCategoryResponseDto> selectAllCategory(SelectCategoryRequestDto requestDto, User user) {
-        hasProjectAndUser(requestDto.getProjectId(), user.getId());
+    public List<SelectCategoryResponseDto> selectAllCategory(Long projectId, User user) {
+        hasProjectAndUser(projectId, user.getId());
         return categoryRepository.findAll().stream().map(SelectCategoryResponseDto::new).toList();
     }
 
