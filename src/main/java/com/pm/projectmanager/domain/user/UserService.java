@@ -8,6 +8,7 @@ import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.dto.UpdateRequestDto;
 import com.pm.projectmanager.domain.user.dto.SignupRequestDto;
+import com.pm.projectmanager.domain.user.dto.UpdatePasswordRequestDto;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.domain.user.dto.WithdrawRequestDto;
 import com.pm.projectmanager.exception.PasswordIncorrectException;
@@ -59,10 +60,20 @@ public class UserService {
 			throw new UserAlreadyExistsException(ResponseExceptionEnum.NICKNAME_ALREADY_EXISTS);
 		}
 
-		String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
-
 		User user = userDetails.getUser();
-		user.update(encodedPassword, requestDto.getNickname(), requestDto.getImage_url());
+		user.update(requestDto.getNickname(), requestDto.getImage_url());
+		userRepository.save(user);
+	}
+
+	public void updatePassword(UpdatePasswordRequestDto requestDto, UserDetailsImpl userDetails) {
+
+		if (!passwordEncoder.matches(requestDto.getOldPassword(), userDetails.getPassword())) {
+			throw new PasswordIncorrectException(ResponseExceptionEnum.PASSWORD_INCORRECT);
+		}
+		User user = userDetails.getUser();
+
+		String encodedPassword = passwordEncoder.encode(requestDto.getNewPassword());
+		user.updatePassword(encodedPassword);
 		userRepository.save(user);
 	}
 
@@ -82,4 +93,6 @@ public class UserService {
 		User user = userDetails.getUser();
 		return new UserResponseDto(user);
 	}
+
+
 }
