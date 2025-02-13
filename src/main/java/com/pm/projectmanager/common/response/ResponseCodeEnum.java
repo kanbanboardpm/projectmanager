@@ -11,10 +11,10 @@ public enum ResponseCodeEnum {
 	// user
 	USER_SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입 성공"),
 	USER_LOGOUT_SUCCESS(HttpStatus.OK, "로그아웃 성공"),
-	USER_UPDATE_SUCCESS(HttpStatus.OK, "유저 수정 성공"),
-	USER_DELETE_SUCCESS(HttpStatus.OK, "유저 삭제 성공"),
-	USER_GET_SUCCESS(HttpStatus.OK, "유저 조회 성공"),
-	USER_PASSWORD_UPDATE_SUCCESS(HttpStatus.OK, "유저 비밀번호 수정 성공"),
+	USER_UPDATE_SUCCESS(HttpStatus.OK, "회원 수정 성공"),
+	USER_DELETE_SUCCESS(HttpStatus.OK, "회원 삭제 성공"),
+	USER_GET_SUCCESS(HttpStatus.OK, "회원 조회 성공"),
+	USER_PASSWORD_UPDATE_SUCCESS(HttpStatus.OK, "회원 비밀번호 수정 성공"),
 	// project
 	PROJECT_CREATE_SUCCESS(HttpStatus.CREATED, "프로젝트 생성 성공"),
 	PROJECT_GET_SUCCESS(HttpStatus.OK, "프로젝트 조회 성공"),
