@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pm.projectmanager.common.response.HttpResponseDto;
 import com.pm.projectmanager.domain.dto.UpdateRequestDto;
 import com.pm.projectmanager.domain.user.dto.SignupRequestDto;
+import com.pm.projectmanager.domain.user.dto.UpdatePasswordRequestDto;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.domain.user.dto.WithdrawRequestDto;
 import com.pm.projectmanager.security.UserDetailsImpl;
@@ -21,7 +22,9 @@ import com.pm.projectmanager.security.UserDetailsImpl;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_DELETE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_GET_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_LOGOUT_SUCCESS;
+import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_PASSWORD_UPDATE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_SIGNUP_SUCCESS;
+import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_UPDATE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseUtils.of;
 
 import jakarta.validation.Valid;
@@ -56,7 +59,16 @@ public class UserController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
 		userService.update(requestDto, userDetails);
-		return of(USER_SIGNUP_SUCCESS);
+		return of(USER_UPDATE_SUCCESS);
+	}
+
+	@PutMapping("/password")
+	public ResponseEntity<HttpResponseDto> updatePassword(
+		@Valid @RequestBody UpdatePasswordRequestDto requestDto,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		userService.updatePassword(requestDto, userDetails);
+		return of(USER_PASSWORD_UPDATE_SUCCESS);
 	}
 
 	@DeleteMapping("/withdraw")
