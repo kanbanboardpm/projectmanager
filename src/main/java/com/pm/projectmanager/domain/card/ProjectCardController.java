@@ -28,9 +28,7 @@ public class ProjectCardController {
             @RequestBody CreateCardRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails)
     {
-        requestDto.setProjectId(projectId);
-        requestDto.setSectionId(sectionId);
-        cardService.createCard(requestDto, userDetails.getUser());
+        cardService.createCard(projectId, sectionId, requestDto, userDetails.getUser());
         return of(CARD_CREATE_SUCCESS);
     }
 
@@ -61,12 +59,9 @@ public class ProjectCardController {
             @PathVariable Long cardId,
             @PathVariable Long projectId,
             @PathVariable Long sectionId,
-            @RequestBody GetCardDetailRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails)
     {
-        requestDto.setProjectId(projectId);
-        requestDto.setSectionId(sectionId);
-        GetCardDetailResponseDto responseDto = cardService.getCardDetail(requestDto, userDetails.getUser(), cardId);
+        GetCardDetailResponseDto responseDto = cardService.getCardDetail(projectId, sectionId, cardId, userDetails.getUser());
         return of(CARD_SELECT_DETAIL_SUCCESS, responseDto);
     }
 }

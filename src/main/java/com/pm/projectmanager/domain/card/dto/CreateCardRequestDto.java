@@ -21,8 +21,6 @@ public class CreateCardRequestDto {
     private String endDate; // ex) 2024-01-31T10:00:00
 
     private Long categoryId;
-    private Long projectId;
-    private Long sectionId;
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 

@@ -26,11 +26,11 @@ public class CardService {
     private final SectionRepository sectionRepository;
     private final ProjectRepository projectRepository;
 
-    public void createCard(CreateCardRequestDto requestDto, User user) {
-        validateUserInProject(requestDto.getProjectId(), user.getId());
+    public void createCard(Long projectId, Long sectionId, CreateCardRequestDto requestDto, User user) {
+        validateUserInProject(projectId, user.getId());
         Category category = categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(
                 () -> new CategoryNotFoundException(ResponseExceptionEnum.CATEGORY_NOT_FOUND));
-        Section section = sectionRepository.findById(requestDto.getSectionId())
+        Section section = sectionRepository.findById(sectionId)
                 .orElseThrow(() -> new SectionException(ResponseExceptionEnum.SECTION_NOT_FOUND));
         Card card = Card.builder()
                 .title(requestDto.getTitle())
@@ -59,9 +59,10 @@ public class CardService {
         return cardRepository.findAllBySectionId(sectionId).stream().map(SelectSectionCardResponseDto::new).toList();
     }
 
-    public GetCardDetailResponseDto getCardDetail(GetCardDetailRequestDto requestDto, User user, Long cardId) {
-        validateUserInProject(requestDto.getProjectId(), user.getId());
-        hasSection(requestDto.getSectionId());
+    //projectId, sectionId, cardId, userDetails.getUser()
+    public GetCardDetailResponseDto getCardDetail(Long projectId, Long sectionId, Long cardId, User user) {
+        validateUserInProject(projectId, user.getId());
+        hasSection(sectionId);
         Card card = cardRepository.findById(cardId).orElseThrow(
                 () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
         );
