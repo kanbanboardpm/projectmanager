@@ -27,8 +27,7 @@ public class ProjectCategoryController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long projectId)
     {
-        requestDto.setProjectId(projectId);
-        categoryService.createCategory(requestDto, userDetails.getUser());
+        categoryService.createCategory(requestDto, userDetails.getUser(), projectId);
         return of(CATEGORY_CREATE_SUCCESS);
     }
 

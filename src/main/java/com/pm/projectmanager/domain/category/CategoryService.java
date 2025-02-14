@@ -23,8 +23,8 @@ public class CategoryService {
     private final AuthorityRepository authorityRepository;
 
     // 카테고리 생성
-    public void createCategory(CreateCategoryRequestDto requestDto, User user) {
-        Authority authority = findByProjectIdAndUserId(requestDto.getProjectId(), user.getId());
+    public void createCategory(CreateCategoryRequestDto requestDto, User user, Long projectId) {
+        Authority authority = findByProjectIdAndUserId(projectId, user.getId());
         try {
             Category category = Category.builder().name(requestDto.getName())
                     .color(requestDto.getColor())

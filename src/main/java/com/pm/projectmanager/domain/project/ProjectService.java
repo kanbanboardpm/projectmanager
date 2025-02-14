@@ -53,9 +53,8 @@ public class ProjectService {
         categoryService.createCategory(new CreateCategoryRequestDto(
                         color,
                         categoryName,
-                        categoryDescription,
-                        project.getId()),
-                        userDetails.getUser());
+                        categoryDescription),
+                        userDetails.getUser(), project.getId());
 	}
 
 	public ProjectResponseDto get(Long projectId, UserDetailsImpl userDetails) {
