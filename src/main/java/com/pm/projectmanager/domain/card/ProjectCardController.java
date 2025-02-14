@@ -38,11 +38,9 @@ public class ProjectCardController {
     @GetMapping("/cards")
     public ResponseEntity<HttpResponseDto> selectAllCard(
             @PathVariable Long projectId,
-            @RequestBody SelectAllCardRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails)
     {
-        requestDto.setProjectId(projectId);
-        List<SelectAllCardResponseDto> responseDto = cardService.selectAllCard(requestDto, userDetails.getUser());
+        List<SelectAllCardResponseDto> responseDto = cardService.selectAllCard(projectId, userDetails.getUser());
         return of(CARD_SELECT_ALL_SUCCESS, responseDto);
     }
 
@@ -51,12 +49,9 @@ public class ProjectCardController {
     public ResponseEntity<HttpResponseDto> selectSectionCard(
             @PathVariable Long projectId,
             @PathVariable Long sectionId,
-            @RequestBody SelectSectionCardRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails)
     {
-        requestDto.setProjectId(projectId);
-        requestDto.setSectionId(sectionId);
-        List<SelectSectionCardResponseDto> responseDto = cardService.selectSectionCard(requestDto, userDetails.getUser());
+        List<SelectSectionCardResponseDto> responseDto = cardService.selectSectionCard(projectId, sectionId, userDetails.getUser());
         return of(CARD_SELECT_SUCCESS, responseDto);
     }
 

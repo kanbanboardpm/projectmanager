@@ -45,18 +45,18 @@ public class CardService {
         cardRepository.save(card);
     }
 
-    public List<SelectAllCardResponseDto> selectAllCard(SelectAllCardRequestDto requestDto, User user) {
-        validateUserInProject(requestDto.getProjectId(), user.getId());
+    public List<SelectAllCardResponseDto> selectAllCard(Long projectId, User user) {
+        validateUserInProject(projectId, user.getId());
         return cardRepository.findAllByCompleteDateIsNull()
                 .stream()
                 .map(SelectAllCardResponseDto::new)
                 .toList();
     }
 
-    public List<SelectSectionCardResponseDto> selectSectionCard(SelectSectionCardRequestDto requestDto, User user) {
-        validateUserInProject(requestDto.getProjectId(), user.getId());
-        hasSection(requestDto.getSectionId());
-        return cardRepository.findAllBySectionId(requestDto.getSectionId()).stream().map(SelectSectionCardResponseDto::new).toList();
+    public List<SelectSectionCardResponseDto> selectSectionCard(Long projectId, Long sectionId, User user) {
+        validateUserInProject(projectId, user.getId());
+        hasSection(sectionId);
+        return cardRepository.findAllBySectionId(sectionId).stream().map(SelectSectionCardResponseDto::new).toList();
     }
 
     public GetCardDetailResponseDto getCardDetail(GetCardDetailRequestDto requestDto, User user, Long cardId) {
