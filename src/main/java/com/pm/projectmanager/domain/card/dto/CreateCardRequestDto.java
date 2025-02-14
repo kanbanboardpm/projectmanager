@@ -3,6 +3,8 @@ package com.pm.projectmanager.domain.card.dto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -25,7 +27,15 @@ public class CreateCardRequestDto {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     private LocalDateTime toLocalDateTime(String date) {
-        return LocalDateTime.parse(date, FORMATTER);
+
+        if (date == null || date.isEmpty()) {
+            return null;
+        }
+        try {
+            return LocalDateTime.parse(date, FORMATTER);
+        } catch (java.time.format.DateTimeParseException e) {
+            return LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
+        }
     }
 
     public LocalDateTime getStartDate() {
