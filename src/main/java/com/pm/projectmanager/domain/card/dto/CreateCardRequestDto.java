@@ -1,10 +1,12 @@
 package com.pm.projectmanager.domain.card.dto;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 public class CreateCardRequestDto {
     private String title;
     private String content;
