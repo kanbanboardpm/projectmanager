@@ -75,4 +75,8 @@ public class Card {
     public void complete(LocalDateTime completeDate) {
         this.completeDate = completeDate;
     }
+
+    public void progress() {
+        this.completeDate = null;
+    }
 }

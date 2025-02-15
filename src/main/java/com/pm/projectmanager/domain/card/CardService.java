@@ -100,6 +100,17 @@ public class CardService {
         card.complete(requestDto.getCompleteDate());
     }
 
+    @Transactional
+    public void progressCard(Long cardId, User user) {
+        Card card = cardRepository.findByIdAndUserId(cardId, user.getId()).orElseThrow(
+                () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
+        );
+        card.optionalCompleteDate().orElseThrow(
+                () -> new CardNotFoundException(ResponseExceptionEnum.CARD_ALREADY_IN_PROGRESS)
+        );
+        card.progress();
+    }
+
     // 프로젝트에 유저가 속해있는지 여부 검증
     private void validateUserInProject(Long projectId, Long userId) {
         hasProject(projectId);
@@ -122,6 +133,4 @@ public class CardService {
             throw new SectionException(ResponseExceptionEnum.SECTION_NOT_FOUND);
         }
     }
-
-
 }

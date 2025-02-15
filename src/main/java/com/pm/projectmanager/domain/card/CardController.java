@@ -49,7 +49,7 @@ public class CardController {
      * @param userDetails : 현재 요청을 보내는 유저의 대한 정보
      * @return : 카드 성공 -> 상태 코드 및 상태 메시지 리턴
      */
-    @PostMapping("/{cardId}")
+    @PutMapping("/{cardId}/complete")
     public ResponseEntity<HttpResponseDto> completeCard(
             @PathVariable Long cardId,
             @RequestBody CompleteCardRequestDto requestDto,
@@ -57,6 +57,15 @@ public class CardController {
     {
         cardService.completeCard(requestDto, userDetails.getUser(), cardId);
         return of(CARD_COMPLETE_SUCCESS);
+    }
+
+    @PutMapping("/{cardId}/progress")
+    public ResponseEntity<HttpResponseDto> progressCard(
+            @PathVariable Long cardId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails)
+    {
+        cardService.progressCard(cardId, userDetails.getUser());
+        return of(CARD_PROGRESS_SUCCESS);
     }
 
 }
