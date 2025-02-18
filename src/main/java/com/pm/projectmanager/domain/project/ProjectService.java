@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.pm.projectmanager.common.Color;
+import com.pm.projectmanager.domain.category.CategoryRepository;
 import com.pm.projectmanager.domain.category.CategoryService;
 import com.pm.projectmanager.domain.category.dto.CreateCategoryRequestDto;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
+import com.pm.projectmanager.domain.section.SectionRepository;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.exception.AuthorityNullException;
 import com.pm.projectmanager.exception.NoInviteException;
@@ -35,6 +37,8 @@ public class ProjectService {
 	private final AuthorityRepository authorityRepository;
 	private final RedisService redisService;
     private final CategoryService categoryService;
+	private final CategoryRepository categoryRepository;
+	private final SectionRepository sectionRepository;
 
 	@Transactional
 	public void create(ProjectCreateDto requestDto, UserDetailsImpl userDetails) {
@@ -101,7 +105,9 @@ public class ProjectService {
 
 		authorityCheck(projectId, userDetails);
 
+		categoryRepository.deleteByProjectId(projectId);
 		authorityRepository.delete(authority);
+		sectionRepository.deleteByProjectId(projectId);
 		projectRepository.delete(project);
 
 	}
