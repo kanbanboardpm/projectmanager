@@ -109,7 +109,6 @@ public class ProjectService {
 		authorityRepository.delete(authority);
 		sectionRepository.deleteByProjectId(projectId);
 		projectRepository.delete(project);
-
 	}
 
 	@Transactional
