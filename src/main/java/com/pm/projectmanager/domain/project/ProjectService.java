@@ -108,13 +108,19 @@ public class ProjectService {
 
 	@Transactional
 	public void invite(ProjectInviteDto requestDto, UserDetailsImpl userDetails, Long projectId) {
-		projectRepository.findById(projectId)
-			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
 
 		authorityCheck(projectId, userDetails);
 
-		inviteCreate(projectId, requestDto.getEmail());
+		projectRepository.findById(projectId)
+			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
+
+		List<String> emailList = requestDto.getEmails();
+
+		for (String email : emailList) {
+			inviteCreate(projectId, email);
+		}
 	}
+
 
 	@Transactional
 	public void inviteAccept(Long projectId, UserDetailsImpl userDetails) {
