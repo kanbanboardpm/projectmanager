@@ -37,7 +37,12 @@ public class RedisService {
 	private String inviteKey(String email, Long projectId) {
 		return "invite:" + email + ":" + projectId;
 	}
-	public void delete(String email) {
+
+	public void deleteRefreshToken(String email) {
 		redisTemplate.delete(email);
+	}
+
+	public void deleteInvite(String email, Long projectId) {
+		redisTemplate.delete(inviteKey(email, projectId));
 	}
 }

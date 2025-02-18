@@ -13,11 +13,8 @@ import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.domain.user.dto.WithdrawRequestDto;
 import com.pm.projectmanager.exception.PasswordIncorrectException;
 import com.pm.projectmanager.exception.UserAlreadyExistsException;
-import com.pm.projectmanager.security.JwtProvider;
 import com.pm.projectmanager.security.UserDetailsImpl;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -50,7 +47,7 @@ public class UserService {
 	}
 
 	public void logout(String username) {
-		redisService.delete(username);
+		redisService.deleteRefreshToken(username);
 	}
 
 	@Transactional

@@ -5,7 +5,10 @@ import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_CRE
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_DELETE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_GET_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_INVITE_SUCCESS;
+import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_REFUSE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_UPDATE_SUCCESS;
+import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_USER_DELETE_SUCCESS;
+import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_USER_GET_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseUtils.of;
 
 import java.util.List;
@@ -26,6 +29,7 @@ import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
+import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -92,6 +96,16 @@ public class ProjectController {
 		return of(PROJECT_INVITE_SUCCESS);
 	}
 
+	@DeleteMapping("/{projectId}/{userId}")
+	public ResponseEntity<HttpResponseDto> deleteUser(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable Long userId,
+		@PathVariable Long projectId
+	) {
+		projectService.deleteUser(projectId, userDetails, userId);
+		return of(PROJECT_USER_DELETE_SUCCESS);
+	}
+
 	@PostMapping("/accept/{projectId}")
 	public ResponseEntity<HttpResponseDto> accept(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -99,5 +113,23 @@ public class ProjectController {
 	) {
 		projectService.inviteAccept(projectId, userDetails);
 		return of(PROJECT_ACCEPT_SUCCESS);
+	}
+
+	@PostMapping("/refuse/{projectId}")
+	public ResponseEntity<HttpResponseDto> refuse(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable Long projectId
+	) {
+		projectService.inviteRefuse(projectId, userDetails);
+		return of(PROJECT_REFUSE_SUCCESS);
+	}
+
+	@GetMapping("/{projectId}/users")
+	public ResponseEntity<HttpResponseDto> getUsers(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable Long projectId
+	) {
+		List<UserResponseDto> responseDto = projectService.getUsers(userDetails, projectId);
+		return of(PROJECT_USER_GET_SUCCESS, responseDto);
 	}
 }

@@ -17,6 +17,7 @@ import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
+import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.exception.AuthorityNullException;
 import com.pm.projectmanager.exception.NoInviteException;
 import com.pm.projectmanager.exception.ProjectNullException;
@@ -124,9 +125,36 @@ public class ProjectService {
 				.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
 
 			authorityService.create(project, userDetails.getUser());
+			redisService.deleteInvite(userDetails.getUser().getEmail(), projectId);
 		} else {
 			throw new NoInviteException(ResponseExceptionEnum.NO_INVITE_EXCEPTION);
 		}
+	}
+
+	@Transactional
+	public void inviteRefuse(Long projectId, UserDetailsImpl userDetails) {
+
+		if (redisService.checkInvite(userDetails.getUser().getEmail(), projectId)) {
+			redisService.deleteInvite(userDetails.getUser().getEmail(), projectId);
+		} else {
+			throw new NoInviteException(ResponseExceptionEnum.NO_INVITE_EXCEPTION);
+		}
+	}
+
+	public List<UserResponseDto> getUsers(UserDetailsImpl userDetails, Long projectId) {
+		authorityCheck(projectId, userDetails);
+		List<Authority> authorities = authorityRepository.findByProjectId(projectId);
+
+		return authorities.stream()
+			.map(authority -> new UserResponseDto(authority.getUser()))
+			.collect(Collectors.toList());
+	}
+
+	@Transactional
+	public void deleteUser(Long projectId, UserDetailsImpl userDetails, Long userId) {
+
+		authorityCheck(projectId, userDetails);
+		authorityRepository.delete(authorityRepository.findByProjectIdAndUserId(projectId, userId));
 	}
 
 	private void inviteCreate(Long projectId, String email) {
@@ -139,5 +167,7 @@ public class ProjectService {
 			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
 		}
 	}
+
+
 }
 
