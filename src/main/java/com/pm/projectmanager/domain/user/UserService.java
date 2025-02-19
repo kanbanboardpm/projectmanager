@@ -53,7 +53,7 @@ public class UserService {
 	@Transactional
 	public void update(UpdateRequestDto requestDto, UserDetailsImpl userDetails) {
 
-		if (userRepository.existsByNickname(requestDto.getNickname())) {
+		if (!requestDto.getNickname().equals(userDetails.getUser().getNickname()) && userRepository.existsByNickname(requestDto.getNickname())) {
 			throw new UserAlreadyExistsException(ResponseExceptionEnum.NICKNAME_ALREADY_EXISTS);
 		}
 
