@@ -15,6 +15,7 @@ import com.pm.projectmanager.domain.authority.Authority;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.authority.AuthorityService;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
+import com.pm.projectmanager.domain.project.dto.ProjectCreateResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
@@ -41,7 +42,7 @@ public class ProjectService {
 	private final SectionRepository sectionRepository;
 
 	@Transactional
-	public void create(ProjectCreateDto requestDto, UserDetailsImpl userDetails) {
+	public ProjectCreateResponseDto create(ProjectCreateDto requestDto, UserDetailsImpl userDetails) {
 
 		Project project = Project.builder()
 			.name(requestDto.getName())
@@ -60,6 +61,8 @@ public class ProjectService {
                         categoryName,
                         categoryDescription),
                         userDetails.getUser(), project.getId());
+
+		return new ProjectCreateResponseDto(project);
 	}
 
 	public ProjectResponseDto get(Long projectId, UserDetailsImpl userDetails) {
