@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pm.projectmanager.common.response.HttpResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
+import com.pm.projectmanager.domain.project.dto.ProjectCreateResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
@@ -46,8 +47,8 @@ public class ProjectController {
 		@RequestBody ProjectCreateDto requestDto,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
-		projectService.create(requestDto, userDetails);
-		return of(PROJECT_CREATE_SUCCESS);
+		ProjectCreateResponseDto responseDto = projectService.create(requestDto, userDetails);
+		return of(PROJECT_CREATE_SUCCESS, responseDto);
 	}
 
 	@GetMapping("/{projectId}")
