@@ -8,7 +8,7 @@ import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.dto.UpdateRequestDto;
 import com.pm.projectmanager.domain.user.dto.SignupRequestDto;
-import com.pm.projectmanager.domain.user.dto.UpdatePasswordRequestDto;
+import com.pm.projectmanager.domain.user.dto.PasswordRequestDto;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.domain.user.dto.WithdrawRequestDto;
 import com.pm.projectmanager.exception.PasswordIncorrectException;
@@ -62,14 +62,18 @@ public class UserService {
 		userRepository.save(user);
 	}
 
-	public void updatePassword(UpdatePasswordRequestDto requestDto, UserDetailsImpl userDetails) {
-
-		if (!passwordEncoder.matches(requestDto.getOldPassword(), userDetails.getPassword())) {
+	public void checkPassword(PasswordRequestDto requestDto, UserDetailsImpl userDetails) {
+		if (!passwordEncoder.matches(requestDto.getPassword(), userDetails.getPassword())) {
 			throw new PasswordIncorrectException(ResponseExceptionEnum.PASSWORD_INCORRECT);
 		}
+	}
+
+	@Transactional
+	public void updatePassword(PasswordRequestDto requestDto, UserDetailsImpl userDetails) {
+
 		User user = userDetails.getUser();
 
-		String encodedPassword = passwordEncoder.encode(requestDto.getNewPassword());
+		String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 		user.updatePassword(encodedPassword);
 		userRepository.save(user);
 	}
