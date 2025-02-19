@@ -119,6 +119,11 @@ public class CardService {
         return cardRepository.findByUserIdAndCompleteDateIsNull(user.getId(), pageable);
     }
 
+    public Page<Card> selectCompleteCard(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return cardRepository.findByUserIdAndCompleteDateIsNotNull(user.getId(), pageable);
+    }
+
     // 프로젝트에 유저가 속해있는지 여부 검증
     private void validateUserInProject(Long projectId, Long userId) {
         hasProject(projectId);
@@ -141,5 +146,4 @@ public class CardService {
             throw new SectionException(ResponseExceptionEnum.SECTION_NOT_FOUND);
         }
     }
-
 }

@@ -14,4 +14,5 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     List<Card> findAllBySectionId(Long sectionId);
     Optional<Card> findByIdAndUserId(Long cardId, Long userId);
     Page<Card> findByUserIdAndCompleteDateIsNull(Long userId, Pageable pageable);
+    Page<Card> findByUserIdAndCompleteDateIsNotNull(Long userId, Pageable pageable);
 }

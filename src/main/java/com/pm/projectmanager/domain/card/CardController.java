@@ -81,4 +81,15 @@ public class CardController {
         return of(CARD_PROGRESS_SELECT_SUCCESS, new PageableResponse<>(cards));
     }
 
+    // 개인의 진행 중인 카드 조회
+    @GetMapping("/completed")
+    public ResponseEntity<HttpResponseDto> selectCompleteCard(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "5") int size,
+            @AuthenticationPrincipal UserDetailsImpl userDetails)
+    {
+        Page<Card> cards = cardService.selectCompleteCard(userDetails.getUser(), page, size);
+        return of(CARD_COMPLETE_SELECT_SUCCESS, new PageableResponse<>(cards));
+    }
+
 }
