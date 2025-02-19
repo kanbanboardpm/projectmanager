@@ -1,11 +1,13 @@
 package com.pm.projectmanager.domain.card;
 
+import com.pm.projectmanager.common.PageableResponse;
 import com.pm.projectmanager.common.response.HttpResponseDto;
 import com.pm.projectmanager.domain.card.dto.CompleteCardRequestDto;
 import com.pm.projectmanager.domain.card.dto.DeleteCardRequestDto;
 import com.pm.projectmanager.domain.card.dto.UpdateCardRequestDto;
 import com.pm.projectmanager.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -66,6 +68,17 @@ public class CardController {
     {
         cardService.progressCard(cardId, userDetails.getUser());
         return of(CARD_PROGRESS_SUCCESS);
+    }
+
+    // 개인의 진행 중인 카드 조회
+    @GetMapping("/progress")
+    public ResponseEntity<HttpResponseDto> selectProgressCard(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "5") int size,
+            @AuthenticationPrincipal UserDetailsImpl userDetails)
+    {
+        Page<Card> cards = cardService.selectProgressCard(userDetails.getUser(), page, size);
+        return of(CARD_PROGRESS_SELECT_SUCCESS, new PageableResponse<>(cards));
     }
 
 }

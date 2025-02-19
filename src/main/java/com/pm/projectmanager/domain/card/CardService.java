@@ -12,6 +12,9 @@ import com.pm.projectmanager.domain.section.SectionRepository;
 import com.pm.projectmanager.domain.user.User;
 import com.pm.projectmanager.exception.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -111,6 +114,11 @@ public class CardService {
         card.progress();
     }
 
+    public Page<Card> selectProgressCard(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return cardRepository.findByUserIdAndCompleteDateIsNull(user.getId(), pageable);
+    }
+
     // 프로젝트에 유저가 속해있는지 여부 검증
     private void validateUserInProject(Long projectId, Long userId) {
         hasProject(projectId);
@@ -133,4 +141,5 @@ public class CardService {
             throw new SectionException(ResponseExceptionEnum.SECTION_NOT_FOUND);
         }
     }
+
 }

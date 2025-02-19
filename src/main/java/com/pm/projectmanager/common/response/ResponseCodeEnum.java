@@ -43,7 +43,8 @@ public enum ResponseCodeEnum {
     CARD_DELETE_SUCCESS(HttpStatus.OK, "카드 삭제 성공"),
     CARD_SELECT_DETAIL_SUCCESS(HttpStatus.OK, "카드 상세 조회 성공"),
     CARD_COMPLETE_SUCCESS(HttpStatus.OK, "카드 완료 상태 변경 성공"),
-    CARD_PROGRESS_SUCCESS(HttpStatus.OK, "카드 진행 상태 변경 성공");
+    CARD_PROGRESS_SUCCESS(HttpStatus.OK, "카드 진행 상태 변경 성공"),
+    CARD_PROGRESS_SELECT_SUCCESS(HttpStatus.OK, "내 진행 카드 조회 성공");
 
 	private final HttpStatus httpStatus;
 	private final String message;
