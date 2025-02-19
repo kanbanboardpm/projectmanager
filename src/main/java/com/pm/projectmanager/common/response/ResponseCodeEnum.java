@@ -46,7 +46,12 @@ public enum ResponseCodeEnum {
     CARD_COMPLETE_SUCCESS(HttpStatus.OK, "카드 완료 상태 변경 성공"),
     CARD_PROGRESS_SUCCESS(HttpStatus.OK, "카드 진행 상태 변경 성공"),
     CARD_PROGRESS_SELECT_SUCCESS(HttpStatus.OK, "내 진행 카드 조회 성공"),
-    CARD_COMPLETE_SELECT_SUCCESS(HttpStatus.OK, "내 완료 카드 조회 성공");
+    CARD_COMPLETE_SELECT_SUCCESS(HttpStatus.OK, "내 완료 카드 조회 성공"),
+    //comment
+    COMMENT_CREATE_SUCCESS(HttpStatus.OK, "댓글 생성 성공"),
+    COMMENT_SELECT_SUCCESS(HttpStatus.OK, "댓글 조회 성공"),
+    COMMENT_UPDATE_SUCCESS(HttpStatus.OK, "댓글 수정 성공"),
+    COMMENT_DELETE_SUCCESS(HttpStatus.OK, "댓글 삭제 성공");
 
 	private final HttpStatus httpStatus;
 	private final String message;
