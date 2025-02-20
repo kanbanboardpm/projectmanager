@@ -40,22 +40,22 @@ public class CategoryService {
     // 카테고리 조회
     public List<SelectCategoryResponseDto> selectAllCategory(Long projectId, User user) {
         hasProjectAndUser(projectId, user.getId());
-        return categoryRepository.findAll().stream().map(SelectCategoryResponseDto::new).toList();
+        return categoryRepository.findByProjectId(projectId).stream().map(SelectCategoryResponseDto::new).toList();
     }
 
     // 카테고리 수정
     @Transactional
-    public void updateCategory(UpdateCategoryRequestDto requestDto, User user) {
-        hasProjectAndUser(requestDto.getProjectId(), user.getId());
-        Category category = categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(
+    public void updateCategory(UpdateCategoryRequestDto requestDto, User user, Long categoryId, Long projectId) {
+        hasProjectAndUser(projectId, user.getId());
+        Category category = categoryRepository.findById(categoryId).orElseThrow(
                 () -> new CategoryNotFoundException(ResponseExceptionEnum.CATEGORY_NOT_FOUND));
         category.update(requestDto.getColor(), requestDto.getName(), requestDto.getDescription());
     }
 
     // 카테고리 삭제
-    public void deleteCategory(DeleteCategoryRequestDto requestDto, User user) {
-        hasProjectAndUser(requestDto.getProjectId(), user.getId());
-        Category category = categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(
+    public void deleteCategory(Long projectId, Long categoryId, User user) {
+        hasProjectAndUser(projectId, user.getId());
+        Category category = categoryRepository.findById(categoryId).orElseThrow(
                 () -> new CategoryNotFoundException(ResponseExceptionEnum.CATEGORY_NOT_FOUND));
         categoryRepository.delete(category);
     }
