@@ -22,6 +22,7 @@ import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
 import com.pm.projectmanager.domain.section.SectionRepository;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;
+import com.pm.projectmanager.exception.AuthorityAlreadyExistsException;
 import com.pm.projectmanager.exception.AuthorityNullException;
 import com.pm.projectmanager.exception.NoInviteException;
 import com.pm.projectmanager.exception.ProjectNullException;
@@ -125,8 +126,13 @@ public class ProjectService {
 
 		List<String> emailList = requestDto.getEmails();
 
+
 		for (String email : emailList) {
-			inviteCreate(projectId, email);
+			if (!hasAuthority(projectId, email)) {
+				inviteCreate(projectId, email);
+			} else {
+				throw new AuthorityAlreadyExistsException(ResponseExceptionEnum.AUTHORITY_ALREADY_EXISTS);
+			}
 		}
 	}
 
@@ -184,6 +190,13 @@ public class ProjectService {
 			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
 		}
 	}
+
+	public boolean hasAuthority(Long projectId, String username) {
+		List<Authority> authorities = authorityRepository.findByProjectId(projectId);
+
+		return authorities.stream().anyMatch(auth -> auth.getUser().getEmail().equals(username));
+	}
+
 
 }
 
