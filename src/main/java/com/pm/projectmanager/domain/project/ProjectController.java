@@ -89,7 +89,7 @@ public class ProjectController {
 		return of(PROJECT_DELETE_SUCCESS);
 	}
 
-	@PostMapping("/invite/{projectId}")
+	@PostMapping("/invites/{projectId}")
 	public ResponseEntity<HttpResponseDto> invite(
 		@RequestBody ProjectInviteDto requestDto,
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -99,7 +99,7 @@ public class ProjectController {
 		return of(PROJECT_INVITE_SUCCESS);
 	}
 
-	@GetMapping("/invite")
+	@GetMapping("/invites")
 	public ResponseEntity<HttpResponseDto> getInvite(
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
