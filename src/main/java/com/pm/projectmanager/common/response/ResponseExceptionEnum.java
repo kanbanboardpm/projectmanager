@@ -19,6 +19,7 @@ public enum ResponseExceptionEnum {
     // category
     CATEGORY_NAME_ALREADY_EXISTS_IN_PROJECT(HttpStatus.BAD_REQUEST, "프로젝트 내에서 카테고리명이 이미 존재합니다."),
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
+    CATEGORY_DELETE_RELATED_CARDS_EXIST(HttpStatus.BAD_REQUEST, "관련 된 카드를 제거해야 카테고리를 지울 수 있습니다."),
 	// section
 	SECTION_NOT_FOUND(HttpStatus.NOT_FOUND, "섹션을 찾을 수 없습니다."),
 	SECTION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "중복된 섹션명입니다."),
