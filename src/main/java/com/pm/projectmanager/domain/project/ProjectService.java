@@ -1,6 +1,7 @@
 package com.pm.projectmanager.domain.project;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.pm.projectmanager.common.Color;
@@ -129,6 +130,9 @@ public class ProjectService {
 		}
 	}
 
+	public Set<String> getInvite(UserDetailsImpl userDetails) {
+		return redisService.getInvites(userDetails.getUsername());
+	}
 
 	@Transactional
 	public void inviteAccept(Long projectId, UserDetailsImpl userDetails) {
@@ -180,7 +184,6 @@ public class ProjectService {
 			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
 		}
 	}
-
 
 }
 

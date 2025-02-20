@@ -1,5 +1,6 @@
 package com.pm.projectmanager.common;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,7 +16,6 @@ public class RedisService {
 
 	private final RedisTemplate<String, String> redisTemplate;
 	private final Long refreshTokenExpiration = 14 * 24 * 60 * 60 * 1000L; // 14일
-	private final Long inviteExpiration = 3 * 24 * 60 * 60 * 1000L; // 3일
 
 	@Transactional
 	public void saveRefreshToken(String email, String refreshToken) {
@@ -27,12 +27,15 @@ public class RedisService {
 	}
 
 	public void invite(String email, Long projectId) {
-		String stringProjectId = String.valueOf(projectId);
-		redisTemplate.opsForSet().add(inviteKey(email), stringProjectId);
+		redisTemplate.opsForSet().add(inviteKey(email), String.valueOf(projectId));
 	}
 
 	public boolean checkInvite(String email, Long projectId) {
 		return redisTemplate.opsForSet().isMember(inviteKey(email), String.valueOf(projectId));
+	}
+
+	public Set<String> getInvites(String email) {
+		return redisTemplate.opsForSet().members(inviteKey(email));
 	}
 
 	private String inviteKey(String email) {

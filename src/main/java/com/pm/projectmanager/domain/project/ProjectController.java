@@ -4,6 +4,7 @@ import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_ACC
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_CREATE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_DELETE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_GET_SUCCESS;
+import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_INVITE_GET_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_INVITE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_REFUSE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_UPDATE_SUCCESS;
@@ -12,6 +13,7 @@ import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_USE
 import static com.pm.projectmanager.common.response.ResponseUtils.of;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -95,6 +97,14 @@ public class ProjectController {
 	) {
 		projectService.invite(requestDto, userDetails, projectId);
 		return of(PROJECT_INVITE_SUCCESS);
+	}
+
+	@GetMapping("/invite")
+	public ResponseEntity<HttpResponseDto> getInvite(
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		Set<String> projectIds = projectService.getInvite(userDetails);
+		return of(PROJECT_INVITE_GET_SUCCESS, projectIds);
 	}
 
 	@DeleteMapping("/{projectId}/{userId}")
