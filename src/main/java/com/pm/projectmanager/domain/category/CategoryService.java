@@ -56,7 +56,7 @@ public class CategoryService {
         Optional<Category> existingCategory = categoryRepository.findByProjectIdAndName(projectId, requestDto.getName());
         if(existingCategory.isPresent()) {
             throw new CategoryNameAlreadyExistsInProjectException(
-                    ResponseExceptionEnum.CATEGORY_DELETE_RELATED_CARDS_EXIST);
+                    ResponseExceptionEnum.CATEGORY_NAME_ALREADY_EXISTS_IN_PROJECT);
         }
         Category category = categoryRepository.findById(categoryId).orElseThrow(
                 () -> new CategoryNotFoundException(ResponseExceptionEnum.CATEGORY_NOT_FOUND));
