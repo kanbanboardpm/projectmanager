@@ -27,15 +27,16 @@ public class RedisService {
 	}
 
 	public void invite(String email, Long projectId) {
-		redisTemplate.opsForValue().set(inviteKey(email, projectId), "pending", inviteExpiration, TimeUnit.MILLISECONDS);
+		String stringProjectId = String.valueOf(projectId);
+		redisTemplate.opsForSet().add(inviteKey(email), stringProjectId);
 	}
 
 	public boolean checkInvite(String email, Long projectId) {
-		return redisTemplate.hasKey("invite:" + email + ":" + projectId);
+		return redisTemplate.opsForSet().isMember(inviteKey(email), String.valueOf(projectId));
 	}
 
-	private String inviteKey(String email, Long projectId) {
-		return "invite:" + email + ":" + projectId;
+	private String inviteKey(String email) {
+		return "invite:" + email;
 	}
 
 	public void deleteRefreshToken(String email) {
@@ -43,6 +44,6 @@ public class RedisService {
 	}
 
 	public void deleteInvite(String email, Long projectId) {
-		redisTemplate.delete(inviteKey(email, projectId));
+		redisTemplate.opsForSet().remove((inviteKey(email)), String.valueOf(projectId));
 	}
 }

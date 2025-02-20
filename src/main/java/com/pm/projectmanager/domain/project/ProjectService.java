@@ -132,7 +132,6 @@ public class ProjectService {
 
 	@Transactional
 	public void inviteAccept(Long projectId, UserDetailsImpl userDetails) {
-		authorityCheck(projectId, userDetails);
 
 		if (redisService.checkInvite(userDetails.getUser().getEmail(), projectId)) {
 			Project project = projectRepository.findById(projectId)
