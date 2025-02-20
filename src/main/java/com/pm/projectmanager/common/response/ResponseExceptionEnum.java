@@ -16,6 +16,7 @@ public enum ResponseExceptionEnum {
 	PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다."),
 	AUTHORITY_NULL_EXCEPTION(HttpStatus.FORBIDDEN, "해당 프로젝트에 권한이 없습니다."),
 	NO_INVITE_EXCEPTION(HttpStatus.NOT_FOUND, "해당 프로젝트에서 받은 초대가 없습니다."),
+	AUTHORITY_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 초대된 유저입니다."),
     // category
     CATEGORY_NAME_ALREADY_EXISTS_IN_PROJECT(HttpStatus.BAD_REQUEST, "프로젝트 내에서 카테고리명이 이미 존재합니다."),
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
