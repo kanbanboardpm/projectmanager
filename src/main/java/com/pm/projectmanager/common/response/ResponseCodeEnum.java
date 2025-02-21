@@ -52,7 +52,9 @@ public enum ResponseCodeEnum {
     COMMENT_CREATE_SUCCESS(HttpStatus.OK, "댓글 생성 성공"),
     COMMENT_SELECT_SUCCESS(HttpStatus.OK, "댓글 조회 성공"),
     COMMENT_UPDATE_SUCCESS(HttpStatus.OK, "댓글 수정 성공"),
-    COMMENT_DELETE_SUCCESS(HttpStatus.OK, "댓글 삭제 성공");
+    COMMENT_DELETE_SUCCESS(HttpStatus.OK, "댓글 삭제 성공"),
+    // notification
+    COMMENT_NOTIFICATION_SELECT_SUCCESS(HttpStatus.OK, "댓글 알림 조회 성공");
 
 	private final HttpStatus httpStatus;
 	private final String message;

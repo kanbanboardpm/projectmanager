@@ -1,14 +1,18 @@
 package com.pm.projectmanager.domain.comment;
 
+import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.card.Card;
 import com.pm.projectmanager.domain.card.CardRepository;
 import com.pm.projectmanager.domain.comment.dto.CreateCommentRequestDto;
 import com.pm.projectmanager.domain.comment.dto.SelectAllCommentResponseDto;
 import com.pm.projectmanager.domain.comment.dto.UpdateCommentRequestDto;
+import com.pm.projectmanager.domain.project.ProjectService;
 import com.pm.projectmanager.domain.user.User;
+import com.pm.projectmanager.domain.user.UserRepository;
 import com.pm.projectmanager.exception.CardNotFoundException;
 import com.pm.projectmanager.exception.CommentNotFoundException;
+import com.pm.projectmanager.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +25,8 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final CardRepository cardRepository;
+    private final UserRepository userRepository;
+    private final RedisService redisService;
 
     public void createComment(CreateCommentRequestDto requestDto, User user, Long cardId) {
         Card card = cardRepository.findById(cardId).orElseThrow(
@@ -32,6 +38,10 @@ public class CommentService {
                 .user(user).build();
 
         commentRepository.save(comment);
+        User cardMasterUser = userRepository.findById(card.getUser().getId()).orElseThrow(
+                () -> new UserNotFoundException(ResponseExceptionEnum.USER_NOT_FOUND)
+        );
+        redisService.commentNotifications(cardMasterUser.getId(), cardMasterUser.getNickname(), card.getSection().getProject().getName(), card.getTitle(), user.getNickname());
     }
 
     public List<SelectAllCommentResponseDto> selectAllComment(User user, Long cardId) {

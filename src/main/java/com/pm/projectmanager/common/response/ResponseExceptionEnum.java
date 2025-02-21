@@ -12,6 +12,7 @@ public enum ResponseExceptionEnum {
 	EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "중복된 이메일입니다."),
 	NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "중복된 닉네임입니다."),
 	PASSWORD_INCORRECT(HttpStatus.BAD_REQUEST, "패스워드가 일치하지 않습니다."),
+    USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 유저 입니다."),
 	// project
 	PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다."),
 	AUTHORITY_NULL_EXCEPTION(HttpStatus.FORBIDDEN, "해당 프로젝트에 권한이 없습니다."),
@@ -29,7 +30,9 @@ public enum ResponseExceptionEnum {
     CARD_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "이미 완료 되어있는 카드 입니다."),
     CARD_ALREADY_IN_PROGRESS(HttpStatus.BAD_REQUEST, "이미 진행 되고있는 카드 입니다."),
     // comment
-    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다.");
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
+    // notification
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글 관련 알림이 없습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;
