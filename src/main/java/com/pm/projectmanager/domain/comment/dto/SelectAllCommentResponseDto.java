@@ -11,11 +11,13 @@ public class SelectAllCommentResponseDto {
     private final String content;
     private final String nickName;
     private final LocalDateTime createAt;
+    private final String photoUrl;
 
-    public SelectAllCommentResponseDto(Comment comment) {
+    public SelectAllCommentResponseDto(Comment comment, String photoUrl) {
         this.commentId = comment.getId();
         this.content = comment.getContent();
         this.nickName = comment.getUser().getNickname();
         this.createAt = comment.getCreatedAt();
+        this.photoUrl = photoUrl;
     }
 }

@@ -45,8 +45,13 @@ public class CommentService {
     }
 
     public List<SelectAllCommentResponseDto> selectAllComment(User user, Long cardId) {
-        List<Comment> comments = commentRepository.findByCardIdAndUserId(cardId, user.getId());
-        return comments.stream().map(SelectAllCommentResponseDto::new).toList();
+        cardRepository.findById(cardId).orElseThrow(
+                () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
+        );
+        List<Comment> comments = commentRepository.findByCardId(cardId);
+        return comments.stream()
+                .map(comment -> new SelectAllCommentResponseDto(comment, comment.getUser().getPhotoUrl()))
+                .toList();
     }
 
     @Transactional

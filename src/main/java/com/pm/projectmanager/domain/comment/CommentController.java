@@ -40,9 +40,6 @@ public class CommentController {
             @PathVariable Long cardId,
             @AuthenticationPrincipal UserDetailsImpl userDetails)
     {
-        cardRepository.findById(cardId).orElseThrow(
-                () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
-        );
         List<SelectAllCommentResponseDto> responseDtoList = commentService.selectAllComment(userDetails.getUser(), cardId);
         return of(COMMENT_SELECT_SUCCESS, responseDtoList);
     }
