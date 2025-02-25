@@ -99,14 +99,6 @@ public class ProjectController {
 		return of(PROJECT_INVITE_SUCCESS);
 	}
 
-	@GetMapping("/invites")
-	public ResponseEntity<HttpResponseDto> getInvite(
-		@AuthenticationPrincipal UserDetailsImpl userDetails
-	) {
-		Set<String> projectIds = projectService.getInvite(userDetails);
-		return of(PROJECT_INVITE_GET_SUCCESS, projectIds);
-	}
-
 	@DeleteMapping("/{projectId}/{userId}")
 	public ResponseEntity<HttpResponseDto> deleteUser(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
