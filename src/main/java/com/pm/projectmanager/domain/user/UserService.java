@@ -81,8 +81,7 @@ public class UserService {
 	@Transactional
 	public void withdraw(WithdrawRequestDto requestDto, UserDetailsImpl userDetails) {
 
-		String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
-		if (passwordEncoder.matches(requestDto.getPassword(), encodedPassword)) {
+		if (passwordEncoder.matches(requestDto.getPassword(), userDetails.getPassword())) {
 			authorityRepository.deleteByUserId(userDetails.getUser().getId());
 			userRepository.delete(userDetails.getUser());
 		} else {
