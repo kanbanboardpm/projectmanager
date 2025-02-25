@@ -31,15 +31,16 @@ public class RedisService {
 	}
 
 	public void invite(String email, Long projectId) {
-		redisTemplate.opsForSet().add(inviteKey(email), String.valueOf(projectId));
+		redisTemplate.opsForList().rightPush(inviteKey(email), String.valueOf(projectId));
 	}
 
 	public boolean checkInvite(String email, Long projectId) {
-		return redisTemplate.opsForSet().isMember(inviteKey(email), String.valueOf(projectId));
+		List<String> invites = redisTemplate.opsForList().range(inviteKey(email), 0, -1);
+		return invites != null && invites.contains(String.valueOf(projectId));
 	}
 
-	public Set<String> getInvites(String email) {
-		return redisTemplate.opsForSet().members(inviteKey(email));
+	public List<String> getInvites(String email) {
+		return redisTemplate.opsForList().range(inviteKey(email), 0, -1);
 	}
 
 	private String inviteKey(String email) {
@@ -51,7 +52,7 @@ public class RedisService {
 	}
 
 	public void deleteInvite(String email, Long projectId) {
-		redisTemplate.opsForSet().remove((inviteKey(email)), String.valueOf(projectId));
+		redisTemplate.opsForList().remove(inviteKey(email), 1, String.valueOf(projectId));
 	}
 
     public void commentNotifications(Long cardMasterUser, String cardMasterNickName, String projectName, String cardName, String nickName) {

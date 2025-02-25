@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.*;
 import static com.pm.projectmanager.common.response.ResponseUtils.of;
@@ -21,6 +22,7 @@ import static com.pm.projectmanager.common.response.ResponseUtils.of;
 public class NotificationController {
 
     private final RedisService redisService;
+    private final NotificationService notificationService;
 
     @GetMapping("/comment")
     public ResponseEntity<HttpResponseDto> getCommentNotification(
@@ -28,5 +30,13 @@ public class NotificationController {
     {
         List<String> notifications = redisService.getCommentNotifications(userDetails.getUser().getId());
         return of(COMMENT_NOTIFICATION_SELECT_SUCCESS, notifications);
+    }
+
+    @GetMapping("/invites")
+    public ResponseEntity<HttpResponseDto> getInvite(
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        List<String> projectIds = notificationService.getInvites(userDetails);
+        return of(PROJECT_INVITE_GET_SUCCESS, projectIds);
     }
 }
