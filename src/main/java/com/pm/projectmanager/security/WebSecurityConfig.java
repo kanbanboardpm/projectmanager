@@ -34,7 +34,7 @@ public class WebSecurityConfig {
 	private final AuthenticationConfiguration authenticationConfiguration;
 	private final RedisService redisService;
 
-    private final String FRONTEND_DOMAIN = "https://teampm.vercel.app/";
+    private final String FRONTEND_DOMAIN = "https://teampm.vercel.app";
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
