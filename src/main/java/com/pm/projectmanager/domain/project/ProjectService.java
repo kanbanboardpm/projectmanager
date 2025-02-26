@@ -136,9 +136,6 @@ public class ProjectService {
 		}
 	}
 
-	public Set<String> getInvite(UserDetailsImpl userDetails) {
-		return redisService.getInvites(userDetails.getUsername());
-	}
 
 	@Transactional
 	public void inviteAccept(Long projectId, UserDetailsImpl userDetails) {
