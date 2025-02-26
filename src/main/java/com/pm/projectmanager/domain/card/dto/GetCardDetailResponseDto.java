@@ -22,7 +22,7 @@ public class GetCardDetailResponseDto {
     public GetCardDetailResponseDto(Card card) {
         this.cardId = card.getId();
         this.title = card.getTitle();
-        this.content = card.getTitle();
+        this.content = card.getContent();
         this.startDate = card.getStartDate();
         this.endDate = card.getEndDate();
         this.completeDate = card.getCompleteDate();
