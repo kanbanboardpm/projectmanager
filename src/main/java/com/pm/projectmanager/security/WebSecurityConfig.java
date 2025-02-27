@@ -34,7 +34,10 @@ public class WebSecurityConfig {
 	private final AuthenticationConfiguration authenticationConfiguration;
 	private final RedisService redisService;
 
-    private final String FRONTEND_DOMAIN = "https://teampm.vercel.app";
+    private static final List<String> FRONTEND_DOMAINS = List.of(
+            "http://localhost:5173", // 로컬 개발 환경
+            "https://teampm.vercel.app" // 실제 배포 환경
+    );
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -64,7 +67,7 @@ public class WebSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // 프론트엔드 URL만 허용
-        configuration.setAllowedOrigins(List.of(FRONTEND_DOMAIN));
+        configuration.setAllowedOrigins(FRONTEND_DOMAINS);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
 
