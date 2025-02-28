@@ -12,6 +12,7 @@ public enum ResponseExceptionEnum {
 	EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "중복된 이메일입니다."),
 	NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "중복된 닉네임입니다."),
 	PASSWORD_INCORRECT(HttpStatus.BAD_REQUEST, "패스워드가 일치하지 않습니다."),
+	PASSWORD_EQUAL(HttpStatus.BAD_REQUEST, "이전 비밀번호와 동일합니다."),
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 유저 입니다."),
 	// project
 	PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다."),

@@ -73,6 +73,9 @@ public class UserService {
 
 		User user = userDetails.getUser();
 
+		if (passwordEncoder.matches(requestDto.getPassword(), userDetails.getPassword())) {
+			throw new PasswordIncorrectException(ResponseExceptionEnum.PASSWORD_EQUAL);
+		}
 		String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 		user.updatePassword(encodedPassword);
 		userRepository.save(user);
