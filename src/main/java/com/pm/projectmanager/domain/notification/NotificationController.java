@@ -1,14 +1,13 @@
 package com.pm.projectmanager.domain.notification;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.HttpResponseDto;
 import com.pm.projectmanager.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
@@ -26,10 +25,25 @@ public class NotificationController {
 
     @GetMapping("/comment")
     public ResponseEntity<HttpResponseDto> getCommentNotification(
-            @AuthenticationPrincipal UserDetailsImpl userDetails)
-    {
-        List<String> notifications = redisService.getCommentNotifications(userDetails.getUser().getId());
+            @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
+        List<CommentNotificationDto> notifications = redisService.getCommentNotifications(userDetails.getUser().getId());
         return of(COMMENT_NOTIFICATION_SELECT_SUCCESS, notifications);
+    }
+
+    // check 로 변경
+    @PutMapping("/comment/{notificationId}")
+    public ResponseEntity<HttpResponseDto> updateCommentNotificationStatusChecked(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable String notificationId) throws JsonProcessingException {
+        notificationService.updateCommentNotificationStatusChecked(userDetails.getUser().getId(), notificationId);
+        return of(UPDATE_COMMENT_NOTIFICATION_STATUS_CHECK);
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<HttpResponseDto> getUncheckNotificationCount(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
+        int count = notificationService.getUncheckNotificationCount(userDetails.getUser().getId());
+        return of(NOTIFICATION_COUNT_SELECT_SUCCESS, count);
     }
 
     @GetMapping("/invites")

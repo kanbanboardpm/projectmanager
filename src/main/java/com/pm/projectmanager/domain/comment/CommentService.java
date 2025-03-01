@@ -1,5 +1,6 @@
 package com.pm.projectmanager.domain.comment;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.card.Card;
@@ -28,7 +29,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final RedisService redisService;
 
-    public void createComment(CreateCommentRequestDto requestDto, User user, Long cardId) {
+    public void createComment(CreateCommentRequestDto requestDto, User user, Long cardId) throws JsonProcessingException {
         Card card = cardRepository.findById(cardId).orElseThrow(
                 () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
         );

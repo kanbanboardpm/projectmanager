@@ -1,12 +1,10 @@
 package com.pm.projectmanager.domain.comment;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pm.projectmanager.common.response.HttpResponseDto;
-import com.pm.projectmanager.common.response.ResponseExceptionEnum;
-import com.pm.projectmanager.domain.card.CardRepository;
 import com.pm.projectmanager.domain.comment.dto.CreateCommentRequestDto;
 import com.pm.projectmanager.domain.comment.dto.SelectAllCommentResponseDto;
 import com.pm.projectmanager.domain.comment.dto.UpdateCommentRequestDto;
-import com.pm.projectmanager.exception.CardNotFoundException;
 import com.pm.projectmanager.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,14 +21,12 @@ import static com.pm.projectmanager.common.response.ResponseUtils.of;
 public class CommentController {
 
     private final CommentService commentService;
-    private final CardRepository cardRepository;
 
     @PostMapping("/api/cards/{cardId}/comments")
     public ResponseEntity<HttpResponseDto> createComment(
             @PathVariable Long cardId,
             @RequestBody CreateCommentRequestDto requestDto,
-            @AuthenticationPrincipal UserDetailsImpl userDetails)
-    {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
         commentService.createComment(requestDto, userDetails.getUser(), cardId);
         return of(COMMENT_CREATE_SUCCESS);
     }
