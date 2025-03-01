@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
+import com.pm.projectmanager.domain.authority.AuthorityService;
 import com.pm.projectmanager.domain.project.Project;
 import com.pm.projectmanager.domain.project.ProjectRepository;
 import com.pm.projectmanager.domain.section.dto.SectionCreateDto;
@@ -28,6 +29,7 @@ public class SectionService {
 	private final SectionRepository sectionRepository;
 	private final ProjectRepository projectRepository;
 	private final AuthorityRepository authorityRepository;
+	private final AuthorityService authorityService;
 
 	public void create(Long projectId, SectionCreateDto requestDto, UserDetailsImpl userDetails) {
 
@@ -71,6 +73,8 @@ public class SectionService {
 	}
 
 	public void update(Long projectId, Long sectionId, SectionUpdateDto requestDto, UserDetailsImpl userDetails) {
+		authorityService.adminCheck(projectId, userDetails.getUser().getId());
+
 		authorityCheck(projectId, userDetails);
 
 		Section section = sectionRepository.findById(sectionId)
@@ -81,6 +85,8 @@ public class SectionService {
 	}
 
 	public void delete(Long projectId, Long sectionId, UserDetailsImpl userDetails) {
+		authorityService.adminCheck(projectId, userDetails.getUser().getId());
+
 		authorityCheck(projectId, userDetails);
 
 		Section section = sectionRepository.findById(sectionId)

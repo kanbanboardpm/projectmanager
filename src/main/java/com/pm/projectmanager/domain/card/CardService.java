@@ -3,6 +3,7 @@ package com.pm.projectmanager.domain.card;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.authority.Authority;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
+import com.pm.projectmanager.domain.authority.AuthorityService;
 import com.pm.projectmanager.domain.card.dto.*;
 import com.pm.projectmanager.domain.category.Category;
 import com.pm.projectmanager.domain.category.CategoryRepository;
@@ -28,6 +29,7 @@ public class CardService {
     private final CategoryRepository categoryRepository;
     private final SectionRepository sectionRepository;
     private final ProjectRepository projectRepository;
+    private final AuthorityService authorityService;
 
     public void createCard(Long projectId, Long sectionId, CreateCardRequestDto requestDto, User user) {
         validateUserInProject(projectId, user.getId());
@@ -74,9 +76,13 @@ public class CardService {
 
     @Transactional
     public void updateCard(UpdateCardRequestDto requestDto, User user, Long cardId) {
+
         Card card = cardRepository.findByIdAndUserId(cardId, user.getId()).orElseThrow(
                 () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
         );
+
+        authorityService.adminCheck(card.getSection().getProject().getId(), user.getId());
+
         Category category = categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(
                 () -> new CategoryNotFoundException(ResponseExceptionEnum.CATEGORY_NOT_FOUND)
         );
@@ -88,6 +94,9 @@ public class CardService {
         Card card = cardRepository.findById(cardId).orElseThrow(
                 () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
         );
+
+        authorityService.adminCheck( card.getSection().getProject().getId(), user.getId());
+
         cardRepository.delete(card);
     }
 

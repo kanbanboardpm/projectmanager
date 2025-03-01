@@ -33,7 +33,9 @@ public enum ResponseExceptionEnum {
     // comment
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
     // notification
-    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글 관련 알림이 없습니다.");
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글 관련 알림이 없습니다."),
+	// authority
+	ADMIN_ROLE_REQUIRED(HttpStatus.FORBIDDEN, "관리자 권한이 필요합니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;

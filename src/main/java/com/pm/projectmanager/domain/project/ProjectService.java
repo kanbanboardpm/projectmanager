@@ -1,7 +1,6 @@
 package com.pm.projectmanager.domain.project;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.pm.projectmanager.common.Color;
@@ -22,7 +21,6 @@ import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
 import com.pm.projectmanager.domain.section.SectionRepository;
-import com.pm.projectmanager.domain.user.User;
 import com.pm.projectmanager.domain.user.UserRepository;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.exception.AuthorityAlreadyExistsException;
@@ -58,7 +56,7 @@ public class ProjectService {
 
 		projectRepository.save(project);
 
-		authorityService.create(project, userDetails.getUser(), UserRole.MANAGER);
+		authorityService.create(project, userDetails.getUser(), UserRole.ADMIN);
 
         Color color = Color.DEFAULT;
         String categoryName = "default";
@@ -93,6 +91,7 @@ public class ProjectService {
 
 	@Transactional
 	public void update(ProjectUpdateDto requestDto, UserDetailsImpl userDetails, Long projectId) {
+		authorityService.adminCheck(projectId, userDetails.getUser().getId());
 
 		Project project = projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
@@ -107,6 +106,7 @@ public class ProjectService {
 
 	@Transactional
 	public void delete(UserDetailsImpl userDetails, Long projectId) {
+		authorityService.adminCheck(projectId, userDetails.getUser().getId());
 
 		Project project = projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
@@ -147,7 +147,6 @@ public class ProjectService {
 			}
 		}
 	}
-
 
 	@Transactional
 	public void inviteAccept(Long projectId, UserDetailsImpl userDetails) {
