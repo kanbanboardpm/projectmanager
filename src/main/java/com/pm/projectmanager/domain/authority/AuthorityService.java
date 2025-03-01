@@ -17,11 +17,12 @@ public class AuthorityService {
 	private final AuthorityRepository authorityRepository;
 
 	@Transactional
-	public void create(Project project, User user) {
+	public void create(Project project, User user, UserRole userRole) {
 
 		Authority authority = Authority.builder()
 			.project(project)
 			.user(user)
+			.userRole(userRole)
 			.build();
 
 		authorityRepository.save(authority);

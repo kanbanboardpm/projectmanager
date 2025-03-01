@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.pm.projectmanager.common.Color;
+import com.pm.projectmanager.domain.authority.UserRole;
 import com.pm.projectmanager.domain.category.CategoryRepository;
 import com.pm.projectmanager.domain.category.CategoryService;
 import com.pm.projectmanager.domain.category.dto.CreateCategoryRequestDto;
@@ -53,7 +54,7 @@ public class ProjectService {
 
 		projectRepository.save(project);
 
-		authorityService.create(project, userDetails.getUser());
+		authorityService.create(project, userDetails.getUser(), UserRole.MANAGER);
 
         Color color = Color.DEFAULT;
         String categoryName = "default";
@@ -144,7 +145,7 @@ public class ProjectService {
 			Project project = projectRepository.findById(projectId)
 				.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
 
-			authorityService.create(project, userDetails.getUser());
+			authorityService.create(project, userDetails.getUser(), UserRole.USER);
 			redisService.deleteInvite(userDetails.getUser().getEmail(), projectId);
 		} else {
 			throw new NoInviteException(ResponseExceptionEnum.NO_INVITE_EXCEPTION);

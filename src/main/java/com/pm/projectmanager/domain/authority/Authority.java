@@ -3,7 +3,10 @@ package com.pm.projectmanager.domain.authority;
 import com.pm.projectmanager.domain.project.Project;
 import com.pm.projectmanager.domain.user.User;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,9 +36,14 @@ public class Authority {
 	@JoinColumn(name = "project_id", nullable = false)
 	private Project project;
 
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private UserRole userRole;
+
 	@Builder
-	public Authority(User user, Project project) {
+	public Authority(User user, Project project, UserRole userRole) {
 		this.user = user;
 		this.project = project;
+		this.userRole = userRole;
 	}
 }
