@@ -1,10 +1,10 @@
 package com.pm.projectmanager.domain.project;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.pm.projectmanager.common.Color;
+import com.pm.projectmanager.domain.authority.UserRole;
 import com.pm.projectmanager.domain.category.CategoryRepository;
 import com.pm.projectmanager.domain.category.CategoryService;
 import com.pm.projectmanager.domain.category.dto.CreateCategoryRequestDto;
@@ -21,11 +21,13 @@ import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
 import com.pm.projectmanager.domain.section.SectionRepository;
+import com.pm.projectmanager.domain.user.UserRepository;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.exception.AuthorityAlreadyExistsException;
 import com.pm.projectmanager.exception.AuthorityNullException;
 import com.pm.projectmanager.exception.NoInviteException;
 import com.pm.projectmanager.exception.ProjectNullException;
+import com.pm.projectmanager.exception.UserNotFoundException;
 import com.pm.projectmanager.security.UserDetailsImpl;
 
 import jakarta.transaction.Transactional;
@@ -42,6 +44,7 @@ public class ProjectService {
     private final CategoryService categoryService;
 	private final CategoryRepository categoryRepository;
 	private final SectionRepository sectionRepository;
+	private final UserRepository userRepository;
 
 	@Transactional
 	public ProjectCreateResponseDto create(ProjectCreateDto requestDto, UserDetailsImpl userDetails) {
@@ -53,7 +56,7 @@ public class ProjectService {
 
 		projectRepository.save(project);
 
-		authorityService.create(project, userDetails.getUser());
+		authorityService.create(project, userDetails.getUser(), UserRole.ADMIN);
 
         Color color = Color.DEFAULT;
         String categoryName = "default";
@@ -88,6 +91,7 @@ public class ProjectService {
 
 	@Transactional
 	public void update(ProjectUpdateDto requestDto, UserDetailsImpl userDetails, Long projectId) {
+		authorityService.adminCheck(projectId, userDetails.getUser().getId());
 
 		Project project = projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
@@ -102,6 +106,7 @@ public class ProjectService {
 
 	@Transactional
 	public void delete(UserDetailsImpl userDetails, Long projectId) {
+		authorityService.adminCheck(projectId, userDetails.getUser().getId());
 
 		Project project = projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
@@ -124,8 +129,15 @@ public class ProjectService {
 		projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
 
+
+
 		List<String> emailList = requestDto.getEmails();
 
+		for (String email : emailList) {
+			if (!userRepository.existsByEmail(email)) {
+				throw new UserNotFoundException(ResponseExceptionEnum.USER_NOT_FOUND);
+			}
+		}
 
 		for (String email : emailList) {
 			if (!hasAuthority(projectId, email)) {
@@ -136,7 +148,6 @@ public class ProjectService {
 		}
 	}
 
-
 	@Transactional
 	public void inviteAccept(Long projectId, UserDetailsImpl userDetails) {
 
@@ -144,7 +155,7 @@ public class ProjectService {
 			Project project = projectRepository.findById(projectId)
 				.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
 
-			authorityService.create(project, userDetails.getUser());
+			authorityService.create(project, userDetails.getUser(), UserRole.USER);
 			redisService.deleteInvite(userDetails.getUser().getEmail(), projectId);
 		} else {
 			throw new NoInviteException(ResponseExceptionEnum.NO_INVITE_EXCEPTION);

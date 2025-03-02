@@ -1,4 +1,4 @@
-package com.pm.projectmanager.domain.dto;
+package com.pm.projectmanager.domain.user.dto;
 
 import lombok.Getter;
 

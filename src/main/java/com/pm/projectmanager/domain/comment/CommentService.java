@@ -3,6 +3,7 @@ package com.pm.projectmanager.domain.comment;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
+import com.pm.projectmanager.domain.authority.AuthorityService;
 import com.pm.projectmanager.domain.card.Card;
 import com.pm.projectmanager.domain.card.CardRepository;
 import com.pm.projectmanager.domain.comment.dto.CreateCommentRequestDto;
@@ -28,6 +29,7 @@ public class CommentService {
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
     private final RedisService redisService;
+    private final AuthorityService authorityService;
 
     public void createComment(CreateCommentRequestDto requestDto, User user, Long cardId) throws JsonProcessingException {
         Card card = cardRepository.findById(cardId).orElseThrow(
@@ -57,9 +59,11 @@ public class CommentService {
 
     @Transactional
     public void updateComment(UpdateCommentRequestDto requestDto, User user, Long commentId) {
+
         Comment comment = commentRepository.findByIdAndUserId(commentId, user.getId()).orElseThrow(
                 () -> new CommentNotFoundException(ResponseExceptionEnum.COMMENT_NOT_FOUND)
         );
+        authorityService.adminCheck(comment.getCard().getSection().getProject().getId(), user.getId());
         comment.update(requestDto);
     }
 
@@ -67,6 +71,7 @@ public class CommentService {
         Comment comment = commentRepository.findByIdAndUserId(commentId, user.getId()).orElseThrow(
                 () -> new CommentNotFoundException(ResponseExceptionEnum.COMMENT_NOT_FOUND)
         );
+        authorityService.adminCheck(comment.getCard().getSection().getProject().getId(), user.getId());
         commentRepository.delete(comment);
     }
 }

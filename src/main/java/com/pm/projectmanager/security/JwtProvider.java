@@ -11,6 +11,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.pm.projectmanager.domain.authority.UserRole;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -82,7 +84,7 @@ public class JwtProvider {
 
 		return BEARER_PREFIX + Jwts.builder()
 			.setSubject(username)
-			.setId(AUTHORIZATION_KEY)  // List 형태로 권한 저장
+			.setId(AUTHORIZATION_KEY)
 			.setExpiration(new Date(date.getTime() + REFRESH_TOKEN_TIME))
 			.setIssuedAt(date) // 발급일
 			.signWith(key, SignatureAlgorithm.HS256)
