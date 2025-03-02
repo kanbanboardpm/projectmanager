@@ -9,6 +9,7 @@ import com.pm.projectmanager.domain.category.CategoryRepository;
 import com.pm.projectmanager.domain.category.CategoryService;
 import com.pm.projectmanager.domain.category.dto.CreateCategoryRequestDto;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
@@ -28,6 +29,7 @@ import com.pm.projectmanager.exception.AuthorityNullException;
 import com.pm.projectmanager.exception.NoInviteException;
 import com.pm.projectmanager.exception.ProjectNullException;
 import com.pm.projectmanager.exception.UserNotFoundException;
+import com.pm.projectmanager.exception.UserRoleException;
 import com.pm.projectmanager.security.UserDetailsImpl;
 
 import jakarta.transaction.Transactional;
@@ -96,7 +98,9 @@ public class ProjectService {
 		Project project = projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
 
-		authorityCheck(projectId, userDetails);
+		if (!authorityService.adminCheck(projectId, userDetails.getUser().getId())) {
+			throw new UserRoleException(ResponseExceptionEnum.ADMIN_ROLE_REQUIRED);
+		}
 
 		project.updateName(requestDto.getName());
 		project.updateColor(requestDto.getColor());
@@ -113,7 +117,9 @@ public class ProjectService {
 
 		Authority authority = authorityRepository.findByProjectIdAndUserId(project.getId(), userDetails.getUser().getId());
 
-		authorityCheck(projectId, userDetails);
+		if (!authorityService.adminCheck(projectId, userDetails.getUser().getId())) {
+			throw new UserRoleException(ResponseExceptionEnum.ADMIN_ROLE_REQUIRED);
+		}
 
 		categoryRepository.deleteByProjectId(projectId);
 		authorityRepository.delete(authority);

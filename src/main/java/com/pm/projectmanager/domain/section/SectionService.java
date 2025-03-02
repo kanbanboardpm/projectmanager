@@ -18,8 +18,10 @@ import com.pm.projectmanager.domain.section.dto.SectionUpdateDto;
 import com.pm.projectmanager.exception.AuthorityNullException;
 import com.pm.projectmanager.exception.ProjectNullException;
 import com.pm.projectmanager.exception.SectionException;
+import com.pm.projectmanager.exception.UserRoleException;
 import com.pm.projectmanager.security.UserDetailsImpl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -72,11 +74,11 @@ public class SectionService {
 			.collect(Collectors.toList());
 	}
 
+	@Transactional
 	public void update(Long projectId, Long sectionId, SectionUpdateDto requestDto, UserDetailsImpl userDetails) {
-		authorityService.adminCheck(projectId, userDetails.getUser().getId());
-
-		authorityCheck(projectId, userDetails);
-
+		if (!authorityService.adminCheck(projectId, userDetails.getUser().getId())) {
+			throw new UserRoleException(ResponseExceptionEnum.ADMIN_ROLE_REQUIRED);
+		}
 		Section section = sectionRepository.findById(sectionId)
 			.orElseThrow(() -> new SectionException(ResponseExceptionEnum.SECTION_NOT_FOUND));
 
@@ -84,11 +86,11 @@ public class SectionService {
 		sectionRepository.save(section);
 	}
 
+	@Transactional
 	public void delete(Long projectId, Long sectionId, UserDetailsImpl userDetails) {
-		authorityService.adminCheck(projectId, userDetails.getUser().getId());
-
-		authorityCheck(projectId, userDetails);
-
+		if (!authorityService.adminCheck(projectId, userDetails.getUser().getId())) {
+			throw new UserRoleException(ResponseExceptionEnum.ADMIN_ROLE_REQUIRED);
+		}
 		Section section = sectionRepository.findById(sectionId)
 			.orElseThrow(() -> new SectionException(ResponseExceptionEnum.SECTION_NOT_FOUND));
 
@@ -100,4 +102,5 @@ public class SectionService {
 			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
 		}
 	}
+
 }

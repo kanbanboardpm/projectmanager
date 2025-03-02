@@ -11,6 +11,7 @@ import com.pm.projectmanager.domain.comment.dto.UpdateCommentRequestDto;
 import com.pm.projectmanager.domain.project.ProjectService;
 import com.pm.projectmanager.domain.user.User;
 import com.pm.projectmanager.domain.user.UserRepository;
+import com.pm.projectmanager.exception.AuthorityNullException;
 import com.pm.projectmanager.exception.CardNotFoundException;
 import com.pm.projectmanager.exception.CommentNotFoundException;
 import com.pm.projectmanager.exception.UserNotFoundException;
@@ -62,15 +63,22 @@ public class CommentService {
         Comment comment = commentRepository.findByIdAndUserId(commentId, user.getId()).orElseThrow(
                 () -> new CommentNotFoundException(ResponseExceptionEnum.COMMENT_NOT_FOUND)
         );
-        authorityService.adminCheck(comment.getCard().getSection().getProject().getId(), user.getId());
+        if (!authorityService.adminCheck(comment.getCard().getSection().getProject().getId(), user.getId())
+            && comment.getCard().getUser() != user) {
+            throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
+        }
         comment.update(requestDto);
     }
 
+    @Transactional
     public void deleteComment(User user, Long commentId) {
         Comment comment = commentRepository.findByIdAndUserId(commentId, user.getId()).orElseThrow(
                 () -> new CommentNotFoundException(ResponseExceptionEnum.COMMENT_NOT_FOUND)
         );
-        authorityService.adminCheck(comment.getCard().getSection().getProject().getId(), user.getId());
+        if (!authorityService.adminCheck(comment.getCard().getSection().getProject().getId(), user.getId())
+            && comment.getCard().getUser() != user) {
+            throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
+        }
         commentRepository.delete(comment);
     }
 }
