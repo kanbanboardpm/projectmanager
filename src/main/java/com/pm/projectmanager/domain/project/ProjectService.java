@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import com.pm.projectmanager.common.Color;
 import com.pm.projectmanager.domain.authority.UserRole;
+import com.pm.projectmanager.domain.card.Card;
+import com.pm.projectmanager.domain.card.CardRepository;
 import com.pm.projectmanager.domain.category.CategoryRepository;
 import com.pm.projectmanager.domain.category.CategoryService;
 import com.pm.projectmanager.domain.category.dto.CreateCategoryRequestDto;
@@ -16,11 +18,13 @@ import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.authority.Authority;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.authority.AuthorityService;
+import com.pm.projectmanager.domain.comment.CommentRepository;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
+import com.pm.projectmanager.domain.section.Section;
 import com.pm.projectmanager.domain.section.SectionRepository;
 import com.pm.projectmanager.domain.user.UserRepository;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;
@@ -47,6 +51,8 @@ public class ProjectService {
 	private final CategoryRepository categoryRepository;
 	private final SectionRepository sectionRepository;
 	private final UserRepository userRepository;
+	private final CardRepository cardRepository;
+	private final CommentRepository commentRepository;
 
 	@Transactional
 	public ProjectCreateResponseDto create(ProjectCreateDto requestDto, UserDetailsImpl userDetails) {
@@ -121,9 +127,17 @@ public class ProjectService {
 			throw new UserRoleException(ResponseExceptionEnum.ADMIN_ROLE_REQUIRED);
 		}
 
+		List<Section> sections = sectionRepository.findAllByProjectId(projectId);
+		for (Section section : sections) {
+			List<Card> cards = cardRepository.findAllBySectionId(section.getId());
+			for (Card card : cards) {
+				commentRepository.deleteAllByCardId(card.getId());
+				cardRepository.delete(card);
+			}
+			sectionRepository.delete(section);
+		}
 		categoryRepository.deleteByProjectId(projectId);
-		authorityRepository.delete(authority);
-		sectionRepository.deleteByProjectId(projectId);
+		authorityRepository.deleteAllByProjectId(projectId);
 		projectRepository.delete(project);
 	}
 

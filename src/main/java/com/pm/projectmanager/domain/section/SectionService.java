@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.authority.AuthorityService;
+import com.pm.projectmanager.domain.card.Card;
+import com.pm.projectmanager.domain.card.CardRepository;
+import com.pm.projectmanager.domain.comment.CommentRepository;
 import com.pm.projectmanager.domain.project.Project;
 import com.pm.projectmanager.domain.project.ProjectRepository;
 import com.pm.projectmanager.domain.section.dto.SectionCreateDto;
@@ -32,6 +35,8 @@ public class SectionService {
 	private final ProjectRepository projectRepository;
 	private final AuthorityRepository authorityRepository;
 	private final AuthorityService authorityService;
+	private final CommentRepository commentRepository;
+	private final CardRepository cardRepository;
 
 	public void create(Long projectId, SectionCreateDto requestDto, UserDetailsImpl userDetails) {
 
@@ -94,6 +99,11 @@ public class SectionService {
 		Section section = sectionRepository.findById(sectionId)
 			.orElseThrow(() -> new SectionException(ResponseExceptionEnum.SECTION_NOT_FOUND));
 
+		List<Card> cards = cardRepository.findAllBySectionId(sectionId);
+		for (Card card : cards) {
+			commentRepository.deleteAllByCardId(card.getId());
+		}
+		cardRepository.deleteAll(cards);
 		sectionRepository.delete(section);
 	}
 
