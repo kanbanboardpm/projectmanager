@@ -76,12 +76,14 @@ public class CardService {
 
     @Transactional
     public void updateCard(UpdateCardRequestDto requestDto, User user, Long cardId) {
-
         Card card = cardRepository.findByIdAndUserId(cardId, user.getId()).orElseThrow(
                 () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
         );
 
-        authorityService.adminCheck(card.getSection().getProject().getId(), user.getId());
+        if (!authorityService.adminCheck(card.getSection().getProject().getId(), user.getId())
+        && card.getUser() != user) {
+            throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
+        }
 
         Category category = categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(
                 () -> new CategoryNotFoundException(ResponseExceptionEnum.CATEGORY_NOT_FOUND)
@@ -89,13 +91,17 @@ public class CardService {
         card.update(requestDto, category);
     }
 
+    @Transactional
     public void deleteCard(DeleteCardRequestDto requestDto, User user, Long cardId) {
         validateUserInProject(requestDto.getProjectId(), user.getId());
         Card card = cardRepository.findById(cardId).orElseThrow(
                 () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
         );
 
-        authorityService.adminCheck( card.getSection().getProject().getId(), user.getId());
+        if (!authorityService.adminCheck(card.getSection().getProject().getId(), user.getId())
+            && card.getUser() != user) {
+            throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
+        }
 
         cardRepository.delete(card);
     }

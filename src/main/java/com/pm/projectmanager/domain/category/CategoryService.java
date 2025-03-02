@@ -63,6 +63,7 @@ public class CategoryService {
     }
 
     // 카테고리 삭제
+    @Transactional
     public void deleteCategory(Long projectId, Long categoryId, User user) {
         hasProjectAndUser(projectId, user.getId());
         Category category = categoryRepository.findById(categoryId).orElseThrow(

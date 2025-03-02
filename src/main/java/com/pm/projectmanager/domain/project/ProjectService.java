@@ -5,21 +5,26 @@ import java.util.stream.Collectors;
 
 import com.pm.projectmanager.common.Color;
 import com.pm.projectmanager.domain.authority.UserRole;
+import com.pm.projectmanager.domain.card.Card;
+import com.pm.projectmanager.domain.card.CardRepository;
 import com.pm.projectmanager.domain.category.CategoryRepository;
 import com.pm.projectmanager.domain.category.CategoryService;
 import com.pm.projectmanager.domain.category.dto.CreateCategoryRequestDto;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.authority.Authority;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.authority.AuthorityService;
+import com.pm.projectmanager.domain.comment.CommentRepository;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
+import com.pm.projectmanager.domain.section.Section;
 import com.pm.projectmanager.domain.section.SectionRepository;
 import com.pm.projectmanager.domain.user.UserRepository;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;
@@ -28,6 +33,7 @@ import com.pm.projectmanager.exception.AuthorityNullException;
 import com.pm.projectmanager.exception.NoInviteException;
 import com.pm.projectmanager.exception.ProjectNullException;
 import com.pm.projectmanager.exception.UserNotFoundException;
+import com.pm.projectmanager.exception.UserRoleException;
 import com.pm.projectmanager.security.UserDetailsImpl;
 
 import jakarta.transaction.Transactional;
@@ -45,6 +51,8 @@ public class ProjectService {
 	private final CategoryRepository categoryRepository;
 	private final SectionRepository sectionRepository;
 	private final UserRepository userRepository;
+	private final CardRepository cardRepository;
+	private final CommentRepository commentRepository;
 
 	@Transactional
 	public ProjectCreateResponseDto create(ProjectCreateDto requestDto, UserDetailsImpl userDetails) {
@@ -96,7 +104,9 @@ public class ProjectService {
 		Project project = projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
 
-		authorityCheck(projectId, userDetails);
+		if (!authorityService.adminCheck(projectId, userDetails.getUser().getId())) {
+			throw new UserRoleException(ResponseExceptionEnum.ADMIN_ROLE_REQUIRED);
+		}
 
 		project.updateName(requestDto.getName());
 		project.updateColor(requestDto.getColor());
@@ -113,11 +123,21 @@ public class ProjectService {
 
 		Authority authority = authorityRepository.findByProjectIdAndUserId(project.getId(), userDetails.getUser().getId());
 
-		authorityCheck(projectId, userDetails);
+		if (!authorityService.adminCheck(projectId, userDetails.getUser().getId())) {
+			throw new UserRoleException(ResponseExceptionEnum.ADMIN_ROLE_REQUIRED);
+		}
 
+		List<Section> sections = sectionRepository.findAllByProjectId(projectId);
+		for (Section section : sections) {
+			List<Card> cards = cardRepository.findAllBySectionId(section.getId());
+			for (Card card : cards) {
+				commentRepository.deleteAllByCardId(card.getId());
+				cardRepository.delete(card);
+			}
+			sectionRepository.delete(section);
+		}
 		categoryRepository.deleteByProjectId(projectId);
-		authorityRepository.delete(authority);
-		sectionRepository.deleteByProjectId(projectId);
+		authorityRepository.deleteAllByProjectId(projectId);
 		projectRepository.delete(project);
 	}
 
