@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
-import com.pm.projectmanager.domain.dto.UpdateRequestDto;
+import com.pm.projectmanager.domain.user.dto.UpdateRequestDto;
 import com.pm.projectmanager.domain.user.dto.SignupRequestDto;
 import com.pm.projectmanager.domain.user.dto.PasswordRequestDto;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;

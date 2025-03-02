@@ -2,6 +2,7 @@ package com.pm.projectmanager.domain.notification;
 
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.HttpResponseDto;
+import com.pm.projectmanager.domain.notification.dto.InviteResponseDto;
 import com.pm.projectmanager.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class NotificationController {
     public ResponseEntity<HttpResponseDto> getInvite(
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        List<String> projectIds = notificationService.getInvites(userDetails);
+        List<InviteResponseDto> projectIds = notificationService.getInvites(userDetails);
         return of(PROJECT_INVITE_GET_SUCCESS, projectIds);
     }
 }
