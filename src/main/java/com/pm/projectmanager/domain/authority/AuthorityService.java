@@ -34,7 +34,7 @@ public class AuthorityService {
 		return role.equals(UserRole.ADMIN);
 	}
 
-	private UserRole getUserRole(Long projectId, Long userId) {
+	public UserRole getUserRole(Long projectId, Long userId) {
 		Authority authority = authorityRepository.findByProjectIdAndUserId(projectId, userId);
 		return authority.getUserRole();
 	}
