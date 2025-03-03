@@ -19,13 +19,16 @@ import com.pm.projectmanager.domain.authority.Authority;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.authority.AuthorityService;
 import com.pm.projectmanager.domain.comment.CommentRepository;
+import com.pm.projectmanager.domain.project.dto.ChangeRoleRequestDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
+import com.pm.projectmanager.domain.project.dto.ProjectUserResponseDto;
 import com.pm.projectmanager.domain.section.Section;
 import com.pm.projectmanager.domain.section.SectionRepository;
+import com.pm.projectmanager.domain.user.User;
 import com.pm.projectmanager.domain.user.UserRepository;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.exception.AuthorityAlreadyExistsException;
@@ -192,12 +195,12 @@ public class ProjectService {
 		}
 	}
 
-	public List<UserResponseDto> getUsers(UserDetailsImpl userDetails, Long projectId) {
+	public List<ProjectUserResponseDto> getUsers(UserDetailsImpl userDetails, Long projectId) {
 		authorityCheck(projectId, userDetails);
 		List<Authority> authorities = authorityRepository.findByProjectId(projectId);
 
 		return authorities.stream()
-			.map(authority -> new UserResponseDto(authority.getUser()))
+			.map(authority -> new ProjectUserResponseDto(authority.getUser(), authority))
 			.collect(Collectors.toList());
 	}
 
@@ -225,6 +228,16 @@ public class ProjectService {
 		return authorities.stream().anyMatch(auth -> auth.getUser().getEmail().equals(username));
 	}
 
+	public void changeUserRole(UserDetailsImpl userDetails, Long projectId, ChangeRoleRequestDto requestDto) {
+		UserRole role = authorityService.getUserRole(projectId, userDetails.getUser().getId());
+		if (role != UserRole.ADMIN) {
+			throw new UserRoleException(ResponseExceptionEnum.ADMIN_ROLE_REQUIRED);
+		}
+		User targetUser = userRepository.findByEmail(requestDto.getEmail());
+		Authority authority = authorityRepository.findByProjectIdAndUserId(projectId, targetUser.getId());
 
+		authority.updateRole(requestDto.getRole());
+		authorityRepository.save(authority);
+	}
 }
 

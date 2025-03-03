@@ -10,6 +10,7 @@ import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_REF
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_UPDATE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_USER_DELETE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_USER_GET_SUCCESS;
+import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_USER_ROLE_CHANGE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseUtils.of;
 
 import java.util.List;
@@ -27,11 +28,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pm.projectmanager.common.response.HttpResponseDto;
+import com.pm.projectmanager.domain.project.dto.ChangeRoleRequestDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
+import com.pm.projectmanager.domain.project.dto.ProjectUserResponseDto;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.security.UserDetailsImpl;
 
@@ -132,7 +135,17 @@ public class ProjectController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@PathVariable Long projectId
 	) {
-		List<UserResponseDto> responseDto = projectService.getUsers(userDetails, projectId);
+		List<ProjectUserResponseDto> responseDto = projectService.getUsers(userDetails, projectId);
 		return of(PROJECT_USER_GET_SUCCESS, responseDto);
+	}
+
+	@PutMapping("/{projectId}/userrole")
+	public ResponseEntity<HttpResponseDto> changeUserRole(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable Long projectId,
+		@RequestBody ChangeRoleRequestDto requestDto
+	) {
+		projectService.changeUserRole(userDetails, projectId, requestDto);
+		return of(PROJECT_USER_ROLE_CHANGE_SUCCESS);
 	}
 }
