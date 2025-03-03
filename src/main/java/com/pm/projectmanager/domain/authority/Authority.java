@@ -46,4 +46,8 @@ public class Authority {
 		this.project = project;
 		this.userRole = userRole;
 	}
+
+	public void updateRole(UserRole newRole) {
+		this.userRole = newRole;
+	}
 }
