@@ -239,5 +239,9 @@ public class ProjectService {
 		authority.updateRole(requestDto.getRole());
 		authorityRepository.save(authority);
 	}
+
+	public List<Project> getProjects(List<Long> ids) {
+		return projectRepository.findAllById(ids);
+	}
 }
 
