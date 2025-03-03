@@ -16,6 +16,7 @@ public enum ResponseCodeEnum {
 	USER_GET_SUCCESS(HttpStatus.OK, "회원 조회 성공"),
 	USER_PASSWORD_UPDATE_SUCCESS(HttpStatus.OK, "회원 비밀번호 수정 성공"),
 	USER_PASSWORD_CORRECT(HttpStatus.OK, "패스워드가 일치합니다."),
+	USERROLE_GET_SUCCESS(HttpStatus.OK, "유저 권한 조회 성공"),
 	// project
 	PROJECT_CREATE_SUCCESS(HttpStatus.CREATED, "프로젝트 생성 성공"),
 	PROJECT_GET_SUCCESS(HttpStatus.OK, "프로젝트 조회 성공"),
