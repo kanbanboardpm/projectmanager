@@ -7,6 +7,7 @@ import com.pm.projectmanager.domain.authority.AuthorityService;
 import com.pm.projectmanager.domain.card.dto.*;
 import com.pm.projectmanager.domain.category.Category;
 import com.pm.projectmanager.domain.category.CategoryRepository;
+import com.pm.projectmanager.domain.comment.CommentRepository;
 import com.pm.projectmanager.domain.project.ProjectRepository;
 import com.pm.projectmanager.domain.section.Section;
 import com.pm.projectmanager.domain.section.SectionRepository;
@@ -30,6 +31,7 @@ public class CardService {
     private final SectionRepository sectionRepository;
     private final ProjectRepository projectRepository;
     private final AuthorityService authorityService;
+    private final CommentRepository commentRepository;
 
     public void createCard(Long projectId, Long sectionId, CreateCardRequestDto requestDto, User user) {
         validateUserInProject(projectId, user.getId());
@@ -103,6 +105,7 @@ public class CardService {
             throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
         }
 
+        commentRepository.deleteAllByCardId(card.getId());
         cardRepository.delete(card);
     }
 
