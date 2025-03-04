@@ -81,7 +81,7 @@ public class CardService {
         );
 
         if (!authorityService.adminCheck(card.getSection().getProject().getId(), user.getId())
-        && card.getUser() != user) {
+        && !card.getUser().getId().equals(user.getId())) {
             throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
         }
 
@@ -99,7 +99,7 @@ public class CardService {
         );
 
         if (!authorityService.adminCheck(card.getSection().getProject().getId(), user.getId())
-            && card.getUser() != user) {
+            && !card.getUser().getId().equals(user.getId())) {
             throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
         }
 
