@@ -65,7 +65,7 @@ public class CommentService {
                 () -> new CommentNotFoundException(ResponseExceptionEnum.COMMENT_NOT_FOUND)
         );
         if (!authorityService.adminCheck(comment.getCard().getSection().getProject().getId(), user.getId())
-            && comment.getUser() != user) {
+            && comment.getUser().getId().equals(user.getId())) {
             throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
         }
         comment.update(requestDto);
@@ -77,7 +77,7 @@ public class CommentService {
                 () -> new CommentNotFoundException(ResponseExceptionEnum.COMMENT_NOT_FOUND)
         );
         if (!authorityService.adminCheck(comment.getCard().getSection().getProject().getId(), user.getId())
-            && comment.getUser() != user) {
+            && comment.getUser().getId().equals(user.getId())) {
             throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
         }
         commentRepository.delete(comment);
