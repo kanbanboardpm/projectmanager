@@ -3,7 +3,9 @@ package com.pm.projectmanager.common;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -34,14 +36,39 @@ public class RedisService {
 		return redisTemplate.opsForValue().get(username);
 	}
 
-	public void invite(String email, Long projectId) {
-		redisTemplate.opsForList().rightPush(inviteKey(email), String.valueOf(projectId));
+	public void invite(String email, Long projectId, Long userId) {
+		redisTemplate.opsForList().rightPush(inviteKey(email), projectId + ":" + userId);
 	}
 
-	public boolean checkInvite(String email, Long projectId) {
+	public boolean checkAndDeleteInvite(String email, Long projectId) {
+
 		List<String> invites = redisTemplate.opsForList().range(inviteKey(email), 0, -1);
-		return invites != null && invites.contains(String.valueOf(projectId));
+
+		if (invites == null || invites.isEmpty()) {
+			return false;
+		}
+
+		Map<Long, Long> ids = new HashMap<>();
+		String valueToDelete = null;
+
+		for (String invite : invites) {
+			String[] parts = invite.split(":");
+			Long project = Long.parseLong(parts[0]);
+			Long user = Long.parseLong(parts[1]);
+			ids.put(project, user);
+
+			if (project.equals(projectId)) {
+				valueToDelete = projectId + ":" + user;
+				break;
+			}
+		}
+		if (valueToDelete != null) {
+			redisTemplate.opsForList().remove(inviteKey(email), 1, valueToDelete);
+			return true;
+		}
+		return false;
 	}
+
 
 	public List<String> getInvites(String email) {
 		return redisTemplate.opsForList().range(inviteKey(email), 0, -1);
@@ -55,8 +82,8 @@ public class RedisService {
 		redisTemplate.delete(email);
 	}
 
-	public void deleteInvite(String email, Long projectId) {
-		redisTemplate.opsForList().remove(inviteKey(email), 1, String.valueOf(projectId));
+	public void deleteInvite(String email, Long projectId, Long userId) {
+		redisTemplate.opsForList().remove(inviteKey(email), 1, projectId + ":" + userId);
 	}
 
     public void commentNotifications(Long cardMasterUser,
