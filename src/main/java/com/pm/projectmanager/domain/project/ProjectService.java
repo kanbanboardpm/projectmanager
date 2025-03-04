@@ -152,8 +152,6 @@ public class ProjectService {
 		projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
 
-
-
 		List<String> emailList = requestDto.getEmails();
 
 		for (String email : emailList) {
@@ -164,7 +162,7 @@ public class ProjectService {
 
 		for (String email : emailList) {
 			if (!hasAuthority(projectId, email)) {
-				inviteCreate(projectId, email);
+				inviteCreate(projectId, email, userDetails.getUser().getId());
 			} else {
 				throw new AuthorityAlreadyExistsException(ResponseExceptionEnum.AUTHORITY_ALREADY_EXISTS);
 			}
@@ -174,12 +172,12 @@ public class ProjectService {
 	@Transactional
 	public void inviteAccept(Long projectId, UserDetailsImpl userDetails) {
 
-		if (redisService.checkInvite(userDetails.getUser().getEmail(), projectId)) {
+		if (redisService.checkAndDeleteInvite(userDetails.getUser().getEmail(), projectId)) {
 			Project project = projectRepository.findById(projectId)
 				.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
 
 			authorityService.create(project, userDetails.getUser(), UserRole.USER);
-			redisService.deleteInvite(userDetails.getUser().getEmail(), projectId);
+			redisService.deleteInvite(userDetails.getUser().getEmail(), projectId, userDetails.getUser().getId());
 		} else {
 			throw new NoInviteException(ResponseExceptionEnum.NO_INVITE_EXCEPTION);
 		}
@@ -188,8 +186,8 @@ public class ProjectService {
 	@Transactional
 	public void inviteRefuse(Long projectId, UserDetailsImpl userDetails) {
 
-		if (redisService.checkInvite(userDetails.getUser().getEmail(), projectId)) {
-			redisService.deleteInvite(userDetails.getUser().getEmail(), projectId);
+		if (redisService.checkAndDeleteInvite(userDetails.getUser().getEmail(), projectId)) {
+			redisService.deleteInvite(userDetails.getUser().getEmail(), projectId, userDetails.getUser().getId());
 		} else {
 			throw new NoInviteException(ResponseExceptionEnum.NO_INVITE_EXCEPTION);
 		}
@@ -211,8 +209,8 @@ public class ProjectService {
 		authorityRepository.delete(authorityRepository.findByProjectIdAndUserId(projectId, userId));
 	}
 
-	private void inviteCreate(Long projectId, String email) {
-		redisService.invite(email, projectId);
+	private void inviteCreate(Long projectId, String email, Long userId) {
+		redisService.invite(email, projectId, userId);
 
 	}
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.HttpResponseDto;
 import com.pm.projectmanager.domain.notification.dto.InviteResponseDto;
+import com.pm.projectmanager.domain.project.dto.ProjectInviteResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +53,7 @@ public class NotificationController {
     public ResponseEntity<HttpResponseDto> getInvite(
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        List<ProjectResponseDto> projects = notificationService.getInvites(userDetails);
+        List<ProjectInviteResponseDto> projects = notificationService.getInvites(userDetails);
         return of(PROJECT_INVITE_GET_SUCCESS, projects);
     }
 }
