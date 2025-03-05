@@ -1,8 +1,13 @@
 package com.pm.projectmanager.domain.project;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pm.projectmanager.common.Color;
 import com.pm.projectmanager.domain.authority.UserRole;
 import com.pm.projectmanager.domain.card.Card;
@@ -20,6 +25,7 @@ import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.authority.AuthorityService;
 import com.pm.projectmanager.domain.comment.CommentRepository;
 import com.pm.projectmanager.domain.project.dto.ChangeRoleRequestDto;
+import com.pm.projectmanager.domain.project.dto.InviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
@@ -145,26 +151,37 @@ public class ProjectService {
 	}
 
 	@Transactional
-	public void invite(ProjectInviteDto requestDto, UserDetailsImpl userDetails, Long projectId) {
+	public void invite(Long projectId, List<String> emails, Long userId) {
+		ObjectMapper objectMapper = new ObjectMapper();
 
-		authorityCheck(projectId, userDetails);
+		List<User> users = userRepository.findByEmailIn(emails);
 
-		projectRepository.findById(projectId)
-			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
+		Map<String, User> userMap = users.stream()
+			.collect(Collectors.toMap(User::getEmail, user -> user));
 
-		List<String> emailList = requestDto.getEmails();
+		List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
+		List<Authority> authorities = authorityRepository.findByProjectIdAndUserIdIn(projectId, userIds);
+		Set<Long> existingUserIds = authorities.stream()
+			.map(authority -> authority.getUser().getId())
+			.collect(Collectors.toSet());
 
-		for (String email : emailList) {
-			if (!userRepository.existsByEmail(email)) {
+		for (String email : emails) {
+			User user = userMap.get(email);
+			if (user == null) {
 				throw new UserNotFoundException(ResponseExceptionEnum.USER_NOT_FOUND);
 			}
-		}
 
-		for (String email : emailList) {
-			if (!hasAuthority(projectId, email)) {
-				inviteCreate(projectId, email, userDetails.getUser().getId());
-			} else {
+			if (existingUserIds.contains(user.getId())) {
 				throw new AuthorityAlreadyExistsException(ResponseExceptionEnum.AUTHORITY_ALREADY_EXISTS);
+			}
+
+			try {
+				InviteDto inviteDto = new InviteDto(projectId, userId);
+				String inviteJson = objectMapper.writeValueAsString(inviteDto);
+
+				redisService.saveInvite(email, inviteJson);
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException("초대 JSON 변환 중 오류 발생", e);
 			}
 		}
 	}
@@ -172,12 +189,12 @@ public class ProjectService {
 	@Transactional
 	public void inviteAccept(Long projectId, UserDetailsImpl userDetails) {
 
-		if (redisService.checkAndDeleteInvite(userDetails.getUser().getEmail(), projectId)) {
+		if (redisService.checkInvite(userDetails.getUser().getEmail(), projectId)) {
 			Project project = projectRepository.findById(projectId)
 				.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
 
 			authorityService.create(project, userDetails.getUser(), UserRole.USER);
-			redisService.deleteInvite(userDetails.getUser().getEmail(), projectId, userDetails.getUser().getId());
+			redisService.deleteInvite(userDetails.getUser().getEmail(), projectId);
 		} else {
 			throw new NoInviteException(ResponseExceptionEnum.NO_INVITE_EXCEPTION);
 		}
@@ -186,8 +203,8 @@ public class ProjectService {
 	@Transactional
 	public void inviteRefuse(Long projectId, UserDetailsImpl userDetails) {
 
-		if (redisService.checkAndDeleteInvite(userDetails.getUser().getEmail(), projectId)) {
-			redisService.deleteInvite(userDetails.getUser().getEmail(), projectId, userDetails.getUser().getId());
+		if (redisService.checkInvite(userDetails.getUser().getEmail(), projectId)) {
+			redisService.deleteInvite(userDetails.getUser().getEmail(), projectId);
 		} else {
 			throw new NoInviteException(ResponseExceptionEnum.NO_INVITE_EXCEPTION);
 		}
