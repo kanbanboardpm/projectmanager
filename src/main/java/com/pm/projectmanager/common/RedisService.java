@@ -126,6 +126,29 @@ public class RedisService {
         return notifications;
     }
 
+    public void deleteCommentNotification(Long cardMasterUserId, String notificationId) throws JsonProcessingException {
+        String key = "notification:" + cardMasterUserId;
+
+        // Redis에서 모든 알림 가져오기
+        List<String> notifications = redisTemplate.opsForList().range(key, 0, -1);
+
+        if (notifications == null || notifications.isEmpty()) {
+            return; // 알림이 없으면 종료
+        }
+
+        // 특정 notificationId를 가진 알림 찾기
+        for (String json : notifications) {
+            CommentNotificationDto notification = objectMapper.readValue(json, CommentNotificationDto.class);
+
+            if (notificationId.equals(notification.getNotificationId())) {
+                // 해당 알림을 삭제 (LREM 사용)
+                redisTemplate.opsForList().remove(key, 1, json);
+                break;
+            }
+        }
+
+    }
+
     public void updateCommentNotificationStatusChecked(Long cardMasterUserId, String notificationId) throws JsonProcessingException {
         String key = "notification:" + cardMasterUserId;
 
@@ -175,4 +198,5 @@ public class RedisService {
 
         return count;
     }
+
 }

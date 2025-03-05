@@ -13,7 +13,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.*;
 import static com.pm.projectmanager.common.response.ResponseUtils.of;
@@ -40,6 +39,14 @@ public class NotificationController {
             @PathVariable String notificationId) throws JsonProcessingException {
         notificationService.updateCommentNotificationStatusChecked(userDetails.getUser().getId(), notificationId);
         return of(UPDATE_COMMENT_NOTIFICATION_STATUS_CHECK);
+    }
+
+    @DeleteMapping("/comment/{notificationId}")
+    public ResponseEntity<HttpResponseDto> deleteCommentNotification(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable String notificationId) throws JsonProcessingException {
+        notificationService.deleteCommentNotification(userDetails.getUser().getId(), notificationId);
+        return of(DELETE_COMMENT_NOTIFICATION);
     }
 
     @GetMapping("/count")
