@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.notification.dto.InviteResponseDto;
+import com.pm.projectmanager.domain.notification.dto.RoleChangeResponseDto;
 import com.pm.projectmanager.domain.project.Project;
 import com.pm.projectmanager.domain.project.ProjectService;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteResponseDto;

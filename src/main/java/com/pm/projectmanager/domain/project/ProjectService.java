@@ -226,21 +226,10 @@ public class ProjectService {
 		authorityRepository.delete(authorityRepository.findByProjectIdAndUserId(projectId, userId));
 	}
 
-	private void inviteCreate(Long projectId, String email, Long userId) {
-		redisService.invite(email, projectId, userId);
-
-	}
-
 	private void authorityCheck(Long projectId, UserDetailsImpl userDetails) {
 		if (!authorityRepository.existsByProjectIdAndUserId(projectId, userDetails.getUser().getId())) {
 			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
 		}
-	}
-
-	public boolean hasAuthority(Long projectId, String username) {
-		List<Authority> authorities = authorityRepository.findByProjectId(projectId);
-
-		return authorities.stream().anyMatch(auth -> auth.getUser().getEmail().equals(username));
 	}
 
 	public void changeUserRole(UserDetailsImpl userDetails, Long projectId, ChangeRoleRequestDto requestDto) {
@@ -252,6 +241,7 @@ public class ProjectService {
 		Authority authority = authorityRepository.findByProjectIdAndUserId(projectId, targetUser.getId());
 
 		authority.updateRole(requestDto.getRole());
+		redisService.roleChangeNotifications(targetUser.getId(), requestDto.getRole());
 		authorityRepository.save(authority);
 	}
 
