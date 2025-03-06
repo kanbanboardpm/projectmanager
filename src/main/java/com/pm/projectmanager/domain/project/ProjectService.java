@@ -258,7 +258,7 @@ public class ProjectService {
 		Authority authority = authorityRepository.findByProjectIdAndUserId(projectId, targetUser.getId());
 
 		authority.updateRole(requestDto.getRole());
-		redisService.roleChangeNotifications(targetUser.getId(), requestDto.getRole());
+		redisService.roleChangeNotifications(targetUser.getId(), requestDto.getRole(), projectId);
 		authorityRepository.save(authority);
 	}
 

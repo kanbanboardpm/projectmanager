@@ -241,10 +241,10 @@ public class RedisService {
 		redisTemplate.opsForList().rightPush(inviteKey(email), inviteJson);
 	}
 
-	public void roleChangeNotifications(Long userId, UserRole role) {
+	public void roleChangeNotifications(Long userId, UserRole role, Long projectId) {
 		String key = "roleNotification:" + userId;
 
-		RoleChangeResponseDto dto = new RoleChangeResponseDto(userId, role);
+		RoleChangeResponseDto dto = new RoleChangeResponseDto(projectId, role);
 		try {
 			String roleChangeJson = objectMapper.writeValueAsString(dto);
 			redisTemplate.opsForList().rightPush(key, roleChangeJson);
