@@ -16,24 +16,27 @@ public class CommentNotificationDto {
     public String cardName;
     public String nickName;
     public String createAt;
+    public String content;
     @Setter
     public String status;
 
-    public CommentNotificationDto(String projectName, String cardName, String nickName, String createAt, String status) {
+    public CommentNotificationDto(String projectName, String cardName, String nickName, String createAt, String content, String status) {
         this.notificationId = UUID.randomUUID().toString();
         this.projectName = projectName;
         this.cardName = cardName;
         this.nickName = nickName;
         this.createAt = createAt;
+        this.content = content;
         this.status = status;
     }
 
-    public CommentNotificationDto(String notificationId, String projectName, String cardName, String nickName, String createAt, String status) {
+    public CommentNotificationDto(String notificationId, String projectName, String cardName, String nickName, String createAt, String content, String status) {
         this.notificationId = notificationId;
         this.projectName = projectName;
         this.cardName = cardName;
         this.nickName = nickName;
         this.createAt = createAt;
+        this.content = content;
         this.status = status;
     }
 }

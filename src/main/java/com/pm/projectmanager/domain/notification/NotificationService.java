@@ -62,6 +62,10 @@ public class NotificationService {
 	// 		.collect(Collectors.toList());
 	// }
 
+    public void deleteCommentNotification(Long cardMasterUserId, String notificationId) throws JsonProcessingException {
+        redisService.deleteCommentNotification(cardMasterUserId, notificationId);
+    }
+
 	public void updateCommentNotificationStatusChecked(Long cardMasterUserId, String notificationId) throws JsonProcessingException {
 		redisService.updateCommentNotificationStatusChecked(cardMasterUserId, notificationId);
 	}
@@ -69,4 +73,5 @@ public class NotificationService {
 	public int getUncheckNotificationCount(Long cardMasterUserId) throws JsonProcessingException {
 		return redisService.getUncheckNotificationCount(cardMasterUserId);
 	}
+
 }
