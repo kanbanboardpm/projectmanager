@@ -13,8 +13,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pm.projectmanager.domain.authority.UserRole;
 import com.pm.projectmanager.domain.notification.CommentNotificationDto;
+import com.pm.projectmanager.domain.notification.dto.InviteResponseDto;
 import com.pm.projectmanager.domain.notification.dto.RoleChangeResponseDto;
+import com.pm.projectmanager.domain.project.Project;
+import com.pm.projectmanager.domain.project.ProjectRepository;
 import com.pm.projectmanager.domain.project.dto.InviteDto;
+import com.pm.projectmanager.domain.project.dto.ProjectInviteResponseDto;
+import com.pm.projectmanager.domain.user.User;
+import com.pm.projectmanager.domain.user.UserRepository;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -30,6 +36,8 @@ public class RedisService {
 	private final RedisTemplate<String, String> redisTemplate;
 	private final Long refreshTokenExpiration = 14 * 24 * 60 * 60 * 1000L; // 14일
 	private final ObjectMapper objectMapper;
+	private final ProjectRepository projectRepository;
+	private final UserRepository userRepository;
 
 	@Transactional
 	public void saveRefreshToken(String email, String refreshToken) {
@@ -40,9 +48,9 @@ public class RedisService {
 		return redisTemplate.opsForValue().get(username);
 	}
 
-	public void invite(String email, Long projectId, Long userId) {
-		redisTemplate.opsForList().rightPush(inviteKey(email), projectId + ":" + userId);
-	}
+	// public void invite(String email, Long projectId, Long userId) {
+	// 	redisTemplate.opsForList().rightPush(inviteKey(email), projectId + ":" + userId);
+	// }
 
 	public boolean checkInvite(String email, Long projectId) {
 		List<String> inviteJsonList = redisTemplate.opsForList().range(inviteKey(email), 0, -1);
@@ -89,8 +97,23 @@ public class RedisService {
 		}
 	}
 
-	public List<String> getInvites(String email) {
-		return redisTemplate.opsForList().range(inviteKey(email), 0, -1);
+	public List<ProjectInviteResponseDto> getInvites(String email) {
+		List<ProjectInviteResponseDto> responseDtos = new ArrayList<>();
+		ObjectMapper objectMapper = new ObjectMapper();
+		List<String> invitesString = redisTemplate.opsForList().range(inviteKey(email), 0, -1);
+		for (String inviteJson : invitesString) {
+			try {
+				InviteDto invite = objectMapper.readValue(inviteJson, InviteDto.class);
+				Project project = projectRepository.findById(invite.getProjectId()).orElse(null);
+				User user = userRepository.findById(invite.getUserId()).orElse(null);
+				if (project != null && user != null) {
+					responseDtos.add(new ProjectInviteResponseDto(project, user));
+				}
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return responseDtos;
 	}
 
 	private String inviteKey(String email) {

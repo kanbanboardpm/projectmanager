@@ -35,32 +35,32 @@ public class NotificationService {
 	private final ProjectService projectService;
 	private final UserRepository userRepository;
 
-	public List<ProjectInviteResponseDto> getInvites(UserDetailsImpl userDetails) {
-		List<String> ids = redisService.getInvites(userDetails.getUsername());
-
-		List<Long> projectIds = new ArrayList<>();
-		Map<Long, Long> projectUserMap = new HashMap<>(); // projectId -> userId 매핑 저장
-
-		for (String id : ids) {
-			String[] parts = id.split(":");
-			Long projectId = Long.parseLong(parts[0]);
-			Long userId = Long.parseLong(parts[1]);
-
-			projectIds.add(projectId);
-			projectUserMap.put(projectId, userId);
-		}
-
-		List<Project> projects = projectService.getProjects(projectIds);
-
-		return projects.stream()
-			.map(project -> {
-				Long userId = projectUserMap.get(project.getId());
-				User user = userRepository.findById(userId)
-					.orElseThrow(() -> new UserNotFoundException(ResponseExceptionEnum.USER_NOT_FOUND));
-				return new ProjectInviteResponseDto(project, user);
-			})
-			.collect(Collectors.toList());
-	}
+	// public List<ProjectInviteResponseDto> getInvites(UserDetailsImpl userDetails) {
+	// 	List<String> ids = redisService.getInvites(userDetails.getUsername());
+	//
+	// 	List<Long> projectIds = new ArrayList<>();
+	// 	Map<Long, Long> projectUserMap = new HashMap<>(); // projectId -> userId 매핑 저장
+	//
+	// 	for (String id : ids) {
+	// 		String[] parts = id.split(":");
+	// 		Long projectId = Long.parseLong(parts[0]);
+	// 		Long userId = Long.parseLong(parts[1]);
+	//
+	// 		projectIds.add(projectId);
+	// 		projectUserMap.put(projectId, userId);
+	// 	}
+	//
+	// 	List<Project> projects = projectService.getProjects(projectIds);
+	//
+	// 	return projects.stream()
+	// 		.map(project -> {
+	// 			Long userId = projectUserMap.get(project.getId());
+	// 			User user = userRepository.findById(userId)
+	// 				.orElseThrow(() -> new UserNotFoundException(ResponseExceptionEnum.USER_NOT_FOUND));
+	// 			return new ProjectInviteResponseDto(project, user);
+	// 		})
+	// 		.collect(Collectors.toList());
+	// }
 
 	public void updateCommentNotificationStatusChecked(Long cardMasterUserId, String notificationId) throws JsonProcessingException {
 		redisService.updateCommentNotificationStatusChecked(cardMasterUserId, notificationId);

@@ -29,6 +29,7 @@ import com.pm.projectmanager.domain.project.dto.InviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
+import com.pm.projectmanager.domain.project.dto.ProjectInviteResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUserResponseDto;
@@ -39,6 +40,7 @@ import com.pm.projectmanager.domain.user.UserRepository;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.exception.AuthorityAlreadyExistsException;
 import com.pm.projectmanager.exception.AuthorityNullException;
+import com.pm.projectmanager.exception.InviteAlreadyExistsException;
 import com.pm.projectmanager.exception.NoInviteException;
 import com.pm.projectmanager.exception.ProjectNullException;
 import com.pm.projectmanager.exception.UserNotFoundException;
@@ -152,10 +154,16 @@ public class ProjectService {
 
 	@Transactional
 	public void invite(Long projectId, List<String> emails, Long userId) {
+		if (!projectRepository.existsById(projectId)) {
+			throw new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND);
+		}
+		if (!authorityRepository.existsByProjectIdAndUserId(projectId, userId)) {
+			throw new UserRoleException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
+		}
+
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		List<User> users = userRepository.findByEmailIn(emails);
-
 		Map<String, User> userMap = users.stream()
 			.collect(Collectors.toMap(User::getEmail, user -> user));
 
@@ -173,6 +181,15 @@ public class ProjectService {
 
 			if (existingUserIds.contains(user.getId())) {
 				throw new AuthorityAlreadyExistsException(ResponseExceptionEnum.AUTHORITY_ALREADY_EXISTS);
+			}
+
+			List<ProjectInviteResponseDto> existingInvites = redisService.getInvites(email);
+			if (existingInvites != null) {
+				for (ProjectInviteResponseDto inviteDto : existingInvites) {
+					if (inviteDto.getId().equals(projectId)) {
+						throw new InviteAlreadyExistsException(ResponseExceptionEnum.INVITE_ALREADY_EXISTS);
+					}
+				}
 			}
 
 			try {

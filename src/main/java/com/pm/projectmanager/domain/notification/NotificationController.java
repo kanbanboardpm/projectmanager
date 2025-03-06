@@ -54,7 +54,7 @@ public class NotificationController {
     public ResponseEntity<HttpResponseDto> getInvite(
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        List<ProjectInviteResponseDto> projects = notificationService.getInvites(userDetails);
+        List<ProjectInviteResponseDto> projects = redisService.getInvites(userDetails.getUser().getEmail());
         return of(PROJECT_INVITE_GET_SUCCESS, projects);
     }
 
