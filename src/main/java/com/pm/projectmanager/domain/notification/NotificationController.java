@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.HttpResponseDto;
 import com.pm.projectmanager.domain.notification.dto.InviteResponseDto;
+import com.pm.projectmanager.domain.notification.dto.RoleChangeResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.security.UserDetailsImpl;
@@ -60,7 +61,15 @@ public class NotificationController {
     public ResponseEntity<HttpResponseDto> getInvite(
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        List<ProjectInviteResponseDto> projects = notificationService.getInvites(userDetails);
+        List<ProjectInviteResponseDto> projects = redisService.getInvites(userDetails.getUser().getEmail());
         return of(PROJECT_INVITE_GET_SUCCESS, projects);
+    }
+
+    @GetMapping("/roles")
+    public ResponseEntity<HttpResponseDto> getRoleChanges(
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        List<RoleChangeResponseDto> changes = redisService.getRoleChangeNotifications(userDetails.getUser().getId());
+        return of(ROLE_CHANGE_GET_SUCCESS, changes);
     }
 }

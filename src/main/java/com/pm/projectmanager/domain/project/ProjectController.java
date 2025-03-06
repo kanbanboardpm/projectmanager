@@ -98,7 +98,7 @@ public class ProjectController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@PathVariable Long projectId
 	) {
-		projectService.invite(requestDto, userDetails, projectId);
+		projectService.invite(projectId, requestDto.getEmails(), userDetails.getUser().getId() );
 		return of(PROJECT_INVITE_SUCCESS);
 	}
 

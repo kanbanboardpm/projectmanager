@@ -11,9 +11,19 @@ import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pm.projectmanager.domain.authority.UserRole;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.comment.CommentRepository;
 import com.pm.projectmanager.domain.notification.CommentNotificationDto;
+import com.pm.projectmanager.domain.notification.dto.InviteResponseDto;
+import com.pm.projectmanager.domain.notification.dto.RoleChangeResponseDto;
+import com.pm.projectmanager.domain.project.Project;
+import com.pm.projectmanager.domain.project.ProjectRepository;
+import com.pm.projectmanager.domain.project.dto.InviteDto;
+import com.pm.projectmanager.domain.project.dto.ProjectInviteResponseDto;
+import com.pm.projectmanager.domain.user.User;
+import com.pm.projectmanager.domain.user.UserRepository;
+
 import com.pm.projectmanager.exception.NotificationNotFoundException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -28,7 +38,9 @@ public class RedisService {
 
 	private final RedisTemplate<String, String> redisTemplate;
 	private final Long refreshTokenExpiration = 14 * 24 * 60 * 60 * 1000L; // 14일
-    private final ObjectMapper objectMapper;
+	private final ObjectMapper objectMapper;
+	private final ProjectRepository projectRepository;
+	private final UserRepository userRepository;
 
 	@Transactional
 	public void saveRefreshToken(String email, String refreshToken) {
@@ -39,42 +51,46 @@ public class RedisService {
 		return redisTemplate.opsForValue().get(username);
 	}
 
-	public void invite(String email, Long projectId, Long userId) {
-		redisTemplate.opsForList().rightPush(inviteKey(email), projectId + ":" + userId);
-	}
+	public boolean checkInvite(String email, Long projectId) {
+		List<String> inviteJsonList = redisTemplate.opsForList().range(inviteKey(email), 0, -1);
 
-	public boolean checkAndDeleteInvite(String email, Long projectId) {
-
-		List<String> invites = redisTemplate.opsForList().range(inviteKey(email), 0, -1);
-
-		if (invites == null || invites.isEmpty()) {
+		if (inviteJsonList == null || inviteJsonList.isEmpty()) {
 			return false;
 		}
 
-		Map<Long, Long> ids = new HashMap<>();
-		String valueToDelete = null;
+		ObjectMapper objectMapper = new ObjectMapper();
 
-		for (String invite : invites) {
-			String[] parts = invite.split(":");
-			Long project = Long.parseLong(parts[0]);
-			Long user = Long.parseLong(parts[1]);
-			ids.put(project, user);
-
-			if (project.equals(projectId)) {
-				valueToDelete = projectId + ":" + user;
-				break;
+		for (String inviteJson : inviteJsonList) {
+			try {
+				InviteDto invite = objectMapper.readValue(inviteJson, InviteDto.class);
+				if (invite.getProjectId().equals(projectId)) {
+					return true;
+				}
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException("Redis 초대 데이터 파싱 오류", e);
 			}
 		}
-		if (valueToDelete != null) {
-			redisTemplate.opsForList().remove(inviteKey(email), 1, valueToDelete);
-			return true;
-		}
+
 		return false;
 	}
 
-
-	public List<String> getInvites(String email) {
-		return redisTemplate.opsForList().range(inviteKey(email), 0, -1);
+	public List<ProjectInviteResponseDto> getInvites(String email) {
+		List<ProjectInviteResponseDto> responseDtos = new ArrayList<>();
+		ObjectMapper objectMapper = new ObjectMapper();
+		List<String> invitesString = redisTemplate.opsForList().range(inviteKey(email), 0, -1);
+		for (String inviteJson : invitesString) {
+			try {
+				InviteDto invite = objectMapper.readValue(inviteJson, InviteDto.class);
+				Project project = projectRepository.findById(invite.getProjectId()).orElse(null);
+				User user = userRepository.findById(invite.getUserId()).orElse(null);
+				if (project != null && user != null) {
+					responseDtos.add(new ProjectInviteResponseDto(project, user));
+				}
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return responseDtos;
 	}
 
 	private String inviteKey(String email) {
@@ -85,8 +101,26 @@ public class RedisService {
 		redisTemplate.delete(email);
 	}
 
-	public void deleteInvite(String email, Long projectId, Long userId) {
-		redisTemplate.opsForList().remove(inviteKey(email), 1, projectId + ":" + userId);
+	public void deleteInvite(String email, Long projectId) {
+		List<String> inviteJsonList = redisTemplate.opsForList().range(inviteKey(email), 0, -1);
+
+		if (inviteJsonList == null || inviteJsonList.isEmpty()) {
+			return;
+		}
+
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		for (String inviteJson : inviteJsonList) {
+			try {
+				InviteDto invite = objectMapper.readValue(inviteJson, InviteDto.class);
+				if (invite.getProjectId().equals(projectId)) {
+					redisTemplate.opsForList().remove(inviteKey(email), 1, inviteJson);
+					return;
+				}
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException("Redis 초대 확인 오류", e);
+			}
+		}
 	}
 
     public void commentNotifications(Long cardMasterUser,
@@ -98,10 +132,10 @@ public class RedisService {
     {
         String key = "notification:" + cardMasterUser;
 
-        // 현재 날짜와 시간 가져오기
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String createAt = now.format(formatter);  // "yyyy-MM-dd HH:mm:ss" 형식으로 포맷
+		// 현재 날짜와 시간 가져오기
+		LocalDateTime now = LocalDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		String createAt = now.format(formatter);  // "yyyy-MM-dd HH:mm:ss" 형식으로 포맷
 
         if (!Objects.equals(cardMasterNickName, nickName)) {
             // JSON 형태로 알림 데이터 저장
@@ -200,7 +234,37 @@ public class RedisService {
             }
         }
 
-        return count;
-    }
+		return count;
+	}
 
+	public void saveInvite(String email, String inviteJson) {
+		redisTemplate.opsForList().rightPush(inviteKey(email), inviteJson);
+	}
+
+	public void roleChangeNotifications(Long userId, UserRole role) {
+		String key = "roleNotification:" + userId;
+
+		RoleChangeResponseDto dto = new RoleChangeResponseDto(userId, role);
+		try {
+			String roleChangeJson = objectMapper.writeValueAsString(dto);
+			redisTemplate.opsForList().rightPush(key, roleChangeJson);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public List<RoleChangeResponseDto> getRoleChangeNotifications(Long userId) {
+
+		List<String> jsonList = redisTemplate.opsForList().range("roleNotification:" + userId, 0, -1);
+		List<RoleChangeResponseDto> roleChangeList = new ArrayList<>();
+		for (String json : jsonList) {
+			try {
+				RoleChangeResponseDto dto = objectMapper.readValue(json, RoleChangeResponseDto.class);
+				roleChangeList.add(dto);
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return roleChangeList;
+	}
 }

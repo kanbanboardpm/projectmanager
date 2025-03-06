@@ -1,8 +1,13 @@
 package com.pm.projectmanager.domain.project;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pm.projectmanager.common.Color;
 import com.pm.projectmanager.domain.authority.UserRole;
 import com.pm.projectmanager.domain.card.Card;
@@ -20,9 +25,11 @@ import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.authority.AuthorityService;
 import com.pm.projectmanager.domain.comment.CommentRepository;
 import com.pm.projectmanager.domain.project.dto.ChangeRoleRequestDto;
+import com.pm.projectmanager.domain.project.dto.InviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
+import com.pm.projectmanager.domain.project.dto.ProjectInviteResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUserResponseDto;
@@ -33,6 +40,7 @@ import com.pm.projectmanager.domain.user.UserRepository;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.exception.AuthorityAlreadyExistsException;
 import com.pm.projectmanager.exception.AuthorityNullException;
+import com.pm.projectmanager.exception.InviteAlreadyExistsException;
 import com.pm.projectmanager.exception.NoInviteException;
 import com.pm.projectmanager.exception.ProjectNullException;
 import com.pm.projectmanager.exception.UserNotFoundException;
@@ -145,26 +153,52 @@ public class ProjectService {
 	}
 
 	@Transactional
-	public void invite(ProjectInviteDto requestDto, UserDetailsImpl userDetails, Long projectId) {
-
-		authorityCheck(projectId, userDetails);
-
-		projectRepository.findById(projectId)
-			.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
-
-		List<String> emailList = requestDto.getEmails();
-
-		for (String email : emailList) {
-			if (!userRepository.existsByEmail(email)) {
-				throw new UserNotFoundException(ResponseExceptionEnum.USER_NOT_FOUND);
-			}
+	public void invite(Long projectId, List<String> emails, Long userId) {
+		if (!projectRepository.existsById(projectId)) {
+			throw new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND);
+		}
+		if (!authorityRepository.existsByProjectIdAndUserId(projectId, userId)) {
+			throw new UserRoleException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
 		}
 
-		for (String email : emailList) {
-			if (!hasAuthority(projectId, email)) {
-				inviteCreate(projectId, email, userDetails.getUser().getId());
-			} else {
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		List<User> users = userRepository.findByEmailIn(emails);
+		Map<String, User> userMap = users.stream()
+			.collect(Collectors.toMap(User::getEmail, user -> user));
+
+		List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
+		List<Authority> authorities = authorityRepository.findByProjectIdAndUserIdIn(projectId, userIds);
+		Set<Long> existingUserIds = authorities.stream()
+			.map(authority -> authority.getUser().getId())
+			.collect(Collectors.toSet());
+
+		for (String email : emails) {
+			User user = userMap.get(email);
+			if (user == null) {
+				throw new UserNotFoundException(ResponseExceptionEnum.USER_NOT_FOUND);
+			}
+
+			if (existingUserIds.contains(user.getId())) {
 				throw new AuthorityAlreadyExistsException(ResponseExceptionEnum.AUTHORITY_ALREADY_EXISTS);
+			}
+
+			List<ProjectInviteResponseDto> existingInvites = redisService.getInvites(email);
+			if (existingInvites != null) {
+				for (ProjectInviteResponseDto inviteDto : existingInvites) {
+					if (inviteDto.getId().equals(projectId)) {
+						throw new InviteAlreadyExistsException(ResponseExceptionEnum.INVITE_ALREADY_EXISTS);
+					}
+				}
+			}
+
+			try {
+				InviteDto inviteDto = new InviteDto(projectId, userId);
+				String inviteJson = objectMapper.writeValueAsString(inviteDto);
+
+				redisService.saveInvite(email, inviteJson);
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException("초대 JSON 변환 중 오류 발생", e);
 			}
 		}
 	}
@@ -172,12 +206,12 @@ public class ProjectService {
 	@Transactional
 	public void inviteAccept(Long projectId, UserDetailsImpl userDetails) {
 
-		if (redisService.checkAndDeleteInvite(userDetails.getUser().getEmail(), projectId)) {
+		if (redisService.checkInvite(userDetails.getUser().getEmail(), projectId)) {
 			Project project = projectRepository.findById(projectId)
 				.orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
 
 			authorityService.create(project, userDetails.getUser(), UserRole.USER);
-			redisService.deleteInvite(userDetails.getUser().getEmail(), projectId, userDetails.getUser().getId());
+			redisService.deleteInvite(userDetails.getUser().getEmail(), projectId);
 		} else {
 			throw new NoInviteException(ResponseExceptionEnum.NO_INVITE_EXCEPTION);
 		}
@@ -186,8 +220,8 @@ public class ProjectService {
 	@Transactional
 	public void inviteRefuse(Long projectId, UserDetailsImpl userDetails) {
 
-		if (redisService.checkAndDeleteInvite(userDetails.getUser().getEmail(), projectId)) {
-			redisService.deleteInvite(userDetails.getUser().getEmail(), projectId, userDetails.getUser().getId());
+		if (redisService.checkInvite(userDetails.getUser().getEmail(), projectId)) {
+			redisService.deleteInvite(userDetails.getUser().getEmail(), projectId);
 		} else {
 			throw new NoInviteException(ResponseExceptionEnum.NO_INVITE_EXCEPTION);
 		}
@@ -209,21 +243,10 @@ public class ProjectService {
 		authorityRepository.delete(authorityRepository.findByProjectIdAndUserId(projectId, userId));
 	}
 
-	private void inviteCreate(Long projectId, String email, Long userId) {
-		redisService.invite(email, projectId, userId);
-
-	}
-
 	private void authorityCheck(Long projectId, UserDetailsImpl userDetails) {
 		if (!authorityRepository.existsByProjectIdAndUserId(projectId, userDetails.getUser().getId())) {
 			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
 		}
-	}
-
-	public boolean hasAuthority(Long projectId, String username) {
-		List<Authority> authorities = authorityRepository.findByProjectId(projectId);
-
-		return authorities.stream().anyMatch(auth -> auth.getUser().getEmail().equals(username));
 	}
 
 	public void changeUserRole(UserDetailsImpl userDetails, Long projectId, ChangeRoleRequestDto requestDto) {
@@ -235,6 +258,7 @@ public class ProjectService {
 		Authority authority = authorityRepository.findByProjectIdAndUserId(projectId, targetUser.getId());
 
 		authority.updateRole(requestDto.getRole());
+		redisService.roleChangeNotifications(targetUser.getId(), requestDto.getRole());
 		authorityRepository.save(authority);
 	}
 
