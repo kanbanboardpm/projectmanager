@@ -51,42 +51,46 @@ public class RedisService {
 		return redisTemplate.opsForValue().get(username);
 	}
 
-	public void invite(String email, Long projectId, Long userId) {
-		redisTemplate.opsForList().rightPush(inviteKey(email), projectId + ":" + userId);
-	}
+	public boolean checkInvite(String email, Long projectId) {
+		List<String> inviteJsonList = redisTemplate.opsForList().range(inviteKey(email), 0, -1);
 
-	public boolean checkAndDeleteInvite(String email, Long projectId) {
-
-		List<String> invites = redisTemplate.opsForList().range(inviteKey(email), 0, -1);
-
-		if (invites == null || invites.isEmpty()) {
+		if (inviteJsonList == null || inviteJsonList.isEmpty()) {
 			return false;
 		}
 
-		Map<Long, Long> ids = new HashMap<>();
-		String valueToDelete = null;
+		ObjectMapper objectMapper = new ObjectMapper();
 
-		for (String invite : invites) {
-			String[] parts = invite.split(":");
-			Long project = Long.parseLong(parts[0]);
-			Long user = Long.parseLong(parts[1]);
-			ids.put(project, user);
-
-			if (project.equals(projectId)) {
-				valueToDelete = projectId + ":" + user;
-				break;
+		for (String inviteJson : inviteJsonList) {
+			try {
+				InviteDto invite = objectMapper.readValue(inviteJson, InviteDto.class);
+				if (invite.getProjectId().equals(projectId)) {
+					return true;
+				}
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException("Redis 초대 데이터 파싱 오류", e);
 			}
 		}
-		if (valueToDelete != null) {
-			redisTemplate.opsForList().remove(inviteKey(email), 1, valueToDelete);
-			return true;
-		}
+
 		return false;
 	}
 
-
-	public List<String> getInvites(String email) {
-		return redisTemplate.opsForList().range(inviteKey(email), 0, -1);
+	public List<ProjectInviteResponseDto> getInvites(String email) {
+		List<ProjectInviteResponseDto> responseDtos = new ArrayList<>();
+		ObjectMapper objectMapper = new ObjectMapper();
+		List<String> invitesString = redisTemplate.opsForList().range(inviteKey(email), 0, -1);
+		for (String inviteJson : invitesString) {
+			try {
+				InviteDto invite = objectMapper.readValue(inviteJson, InviteDto.class);
+				Project project = projectRepository.findById(invite.getProjectId()).orElse(null);
+				User user = userRepository.findById(invite.getUserId()).orElse(null);
+				if (project != null && user != null) {
+					responseDtos.add(new ProjectInviteResponseDto(project, user));
+				}
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return responseDtos;
 	}
 
 	private String inviteKey(String email) {
@@ -97,8 +101,26 @@ public class RedisService {
 		redisTemplate.delete(email);
 	}
 
-	public void deleteInvite(String email, Long projectId, Long userId) {
-		redisTemplate.opsForList().remove(inviteKey(email), 1, projectId + ":" + userId);
+	public void deleteInvite(String email, Long projectId) {
+		List<String> inviteJsonList = redisTemplate.opsForList().range(inviteKey(email), 0, -1);
+
+		if (inviteJsonList == null || inviteJsonList.isEmpty()) {
+			return;
+		}
+
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		for (String inviteJson : inviteJsonList) {
+			try {
+				InviteDto invite = objectMapper.readValue(inviteJson, InviteDto.class);
+				if (invite.getProjectId().equals(projectId)) {
+					redisTemplate.opsForList().remove(inviteKey(email), 1, inviteJson);
+					return;
+				}
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException("Redis 초대 확인 오류", e);
+			}
+		}
 	}
 
     public void commentNotifications(Long cardMasterUser,
