@@ -11,7 +11,10 @@ import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pm.projectmanager.common.response.ResponseExceptionEnum;
+import com.pm.projectmanager.domain.comment.CommentRepository;
 import com.pm.projectmanager.domain.notification.CommentNotificationDto;
+import com.pm.projectmanager.exception.NotificationNotFoundException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,7 +93,8 @@ public class RedisService {
                                      String cardMasterNickName,
                                      String projectName,
                                      String cardName,
-                                     String nickName) throws JsonProcessingException
+                                     String nickName,
+                                     String content) throws JsonProcessingException
     {
         String key = "notification:" + cardMasterUser;
 
@@ -101,10 +105,10 @@ public class RedisService {
 
         if (!Objects.equals(cardMasterNickName, nickName)) {
             // JSON 형태로 알림 데이터 저장
-            CommentNotificationDto notification = new CommentNotificationDto(projectName, cardName, nickName, createAt, "uncheck");
+            CommentNotificationDto notification = new CommentNotificationDto(projectName, cardName, nickName, createAt, content, "uncheck");
             String messageJson = objectMapper.writeValueAsString(notification);
 
-            redisTemplate.opsForList().rightPush(key, messageJson);
+            redisTemplate.opsForList().leftPush(key, messageJson);
             redisTemplate.expire(key, 3, TimeUnit.DAYS);
         }
     }
@@ -133,7 +137,7 @@ public class RedisService {
         List<String> notifications = redisTemplate.opsForList().range(key, 0, -1);
 
         if (notifications == null || notifications.isEmpty()) {
-            return; // 알림이 없으면 종료
+            throw new NotificationNotFoundException(ResponseExceptionEnum.NOTIFICATION_NOT_FOUND);
         }
 
         // 특정 notificationId를 가진 알림 찾기
