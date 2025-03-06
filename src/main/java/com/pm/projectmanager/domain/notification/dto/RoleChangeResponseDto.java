@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class RoleChangeResponseDto {
-	private Long userId;
+	private Long projectId;
 	private UserRole role;
 
-	public RoleChangeResponseDto(final Long userId, final UserRole role) {
-		this.userId = userId;
+	public RoleChangeResponseDto(final Long projectId, final UserRole role) {
+		this.projectId = projectId;
 		this.role = role;
 	}
 }
