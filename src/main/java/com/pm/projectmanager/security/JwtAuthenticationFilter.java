@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         log.info("인증 성공 및 JWT 생성");
         String email = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
 
-        String accessToken = jwtProvider.createAccessToken(email); // Set<UserRole> 전달
+        String accessToken = jwtProvider.createAccessToken(email);
         String refreshToken = jwtProvider.createRefreshToken(email);
 
         res.setHeader(AUTHORIZATION_HEADER, accessToken);
