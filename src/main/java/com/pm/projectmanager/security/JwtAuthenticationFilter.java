@@ -78,6 +78,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest req, HttpServletResponse res, AuthenticationException failed) throws IOException {
         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        res.getWriter().print("{\"error\":\"Unauthorized\", \"message\":\"" + failed.getMessage() + "\"}");
+        res.setCharacterEncoding("UTF-8");
+        res.setContentType("application/json");
+
+        String jsonResponse = new ObjectMapper().writeValueAsString(new LoginResponseDto(failed.getMessage()));
+        res.getWriter().print(jsonResponse);
     }
 }
