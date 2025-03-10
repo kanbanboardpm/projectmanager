@@ -29,7 +29,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public JwtAuthenticationFilter(JwtProvider jwtProvider, RedisService redisService) {
         this.jwtProvider = jwtProvider;
 		this.redisService = redisService;
-		setFilterProcessesUrl("/api/users/login"); // 로그인 경로 설정
+		setFilterProcessesUrl("/api/users/login");
     }
 
 
