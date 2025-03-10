@@ -254,7 +254,8 @@ public class ProjectService {
 		if (role != UserRole.ADMIN) {
 			throw new UserRoleException(ResponseExceptionEnum.ADMIN_ROLE_REQUIRED);
 		}
-		User targetUser = userRepository.findByEmail(requestDto.getEmail());
+		User targetUser = userRepository.findByEmail(requestDto.getEmail())
+			.orElseThrow(() -> new UserNotFoundException(ResponseExceptionEnum.USER_NOT_FOUND));
 		Authority authority = authorityRepository.findByProjectIdAndUserId(projectId, targetUser.getId());
 
 		authority.updateRole(requestDto.getRole());
