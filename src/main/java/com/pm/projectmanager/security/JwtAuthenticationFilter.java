@@ -11,8 +11,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pm.projectmanager.common.RedisService;
+import com.pm.projectmanager.common.response.ResponseExceptionEnum;
+import com.pm.projectmanager.domain.user.User;
+import com.pm.projectmanager.domain.user.UserRepository;
 import com.pm.projectmanager.domain.user.dto.LoginRequestDto;
 import com.pm.projectmanager.domain.user.dto.LoginResponseDto;
+import com.pm.projectmanager.exception.UserDeletedException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,6 +62,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         FilterChain chain, Authentication authResult) throws IOException {
         log.info("인증 성공 및 JWT 생성");
         String email = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
+        User user = ((UserDetailsImpl)authResult.getPrincipal()).getUser();
+        if (user.getIsDeleted() != null) {
+            throw new UserDeletedException(ResponseExceptionEnum.USER_DELETED);
+        }
 
         String accessToken = jwtProvider.createAccessToken(email);
         String refreshToken = jwtProvider.createRefreshToken(email);
