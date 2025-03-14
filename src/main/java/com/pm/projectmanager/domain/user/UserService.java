@@ -87,8 +87,8 @@ public class UserService {
 	public void withdraw(WithdrawRequestDto requestDto, UserDetailsImpl userDetails) {
 
 		if (passwordEncoder.matches(requestDto.getPassword(), userDetails.getPassword())) {
-			authorityRepository.deleteByUserId(userDetails.getUser().getId());
 			userDetails.getUser().withdraw(LocalDateTime.now());
+			userRepository.save(userDetails.getUser());
 		} else {
 			throw new PasswordIncorrectException(ResponseExceptionEnum.PASSWORD_INCORRECT);
 		}
