@@ -47,21 +47,22 @@ public class CategoryService {
         return categoryRepository.findByProjectId(projectId).stream().map(SelectCategoryResponseDto::new).toList();
     }
 
-    // 카테고리 수정
     @Transactional
     public void updateCategory(UpdateCategoryRequestDto requestDto, User user, Long categoryId, Long projectId) {
         hasProjectAndUser(projectId, user.getId());
 
-        Optional<Category> existingCategory = categoryRepository.findByProjectIdAndName(projectId, requestDto.getName());
-        if(existingCategory.isPresent()) {
-            throw new CategoryNameAlreadyExistsInProjectException(
-                    ResponseExceptionEnum.CATEGORY_NAME_ALREADY_EXISTS_IN_PROJECT);
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new CategoryNotFoundException(ResponseExceptionEnum.CATEGORY_NOT_FOUND));
+
+        if (!category.getName().equals(requestDto.getName())) {
+            Optional<Category> existingCategory = categoryRepository.findByProjectIdAndName(projectId, requestDto.getName());
+            if (existingCategory.isPresent()) {
+                throw new CategoryNameAlreadyExistsInProjectException(
+                        ResponseExceptionEnum.CATEGORY_NAME_ALREADY_EXISTS_IN_PROJECT);
+            }
         }
-        Category category = categoryRepository.findById(categoryId).orElseThrow(
-                () -> new CategoryNotFoundException(ResponseExceptionEnum.CATEGORY_NOT_FOUND));
         category.update(requestDto.getColor(), requestDto.getName(), requestDto.getDescription());
     }
-
     // 카테고리 삭제
     @Transactional
     public void deleteCategory(Long projectId, Long categoryId, User user) {
