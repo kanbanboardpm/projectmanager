@@ -112,20 +112,27 @@ public class CardService {
     // 카드 완료
     @Transactional
     public void completeCard(CompleteCardRequestDto requestDto, User user, Long cardId) {
-        Card card = cardRepository.findByIdAndUserId(cardId, user.getId()).orElseThrow(
+        Card card = cardRepository.findById(cardId).orElseThrow(
                 () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
         );
+        if (!authorityService.adminCheck(card.getSection().getProject().getId(), user.getId()) && !card.getUser().getId().equals(user.getId())) {
+            throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
+        }
         card.optionalCompleteDate().ifPresent(date -> {
             throw new CardAlreadyCompletedException(ResponseExceptionEnum.CARD_ALREADY_COMPLETED);
         });
+
         card.complete(requestDto.getCompleteDate());
     }
 
     @Transactional
     public void progressCard(Long cardId, User user) {
-        Card card = cardRepository.findByIdAndUserId(cardId, user.getId()).orElseThrow(
+        Card card = cardRepository.findById(cardId).orElseThrow(
                 () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
         );
+        if (!authorityService.adminCheck(card.getSection().getProject().getId(), user.getId()) && !card.getUser().getId().equals(user.getId())) {
+            throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
+        }
         card.optionalCompleteDate().orElseThrow(
                 () -> new CardNotFoundException(ResponseExceptionEnum.CARD_ALREADY_IN_PROGRESS)
         );
