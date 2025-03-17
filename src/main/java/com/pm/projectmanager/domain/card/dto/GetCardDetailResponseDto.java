@@ -18,6 +18,7 @@ public class GetCardDetailResponseDto {
     private final String categoryName;
     private final String nickName;
     private final String photoUrl;
+    private final Long userId;
 
     public GetCardDetailResponseDto(Card card) {
         this.cardId = card.getId();
@@ -30,6 +31,7 @@ public class GetCardDetailResponseDto {
         this.categoryName = card.getCategory().getName();
         this.nickName = card.getUser().getNickname();
         this.photoUrl = card.getUser().getPhotoUrl();
+        this.userId = card.getUser().getId();
     }
 
 }

@@ -12,6 +12,7 @@ public class SelectAllCommentResponseDto {
     private final String nickName;
     private final LocalDateTime createAt;
     private final String photoUrl;
+    private final Long userId;
 
     public SelectAllCommentResponseDto(Comment comment, String photoUrl) {
         this.commentId = comment.getId();
@@ -19,5 +20,6 @@ public class SelectAllCommentResponseDto {
         this.nickName = comment.getUser().getNickname();
         this.createAt = comment.getCreatedAt();
         this.photoUrl = photoUrl;
+        this.userId = comment.getUser().getId();
     }
 }
