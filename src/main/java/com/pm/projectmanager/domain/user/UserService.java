@@ -1,5 +1,7 @@
 package com.pm.projectmanager.domain.user;
 
+import java.time.LocalDateTime;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -85,8 +87,8 @@ public class UserService {
 	public void withdraw(WithdrawRequestDto requestDto, UserDetailsImpl userDetails) {
 
 		if (passwordEncoder.matches(requestDto.getPassword(), userDetails.getPassword())) {
-			authorityRepository.deleteByUserId(userDetails.getUser().getId());
-			userRepository.delete(userDetails.getUser());
+			userDetails.getUser().withdraw(LocalDateTime.now());
+			userRepository.save(userDetails.getUser());
 		} else {
 			throw new PasswordIncorrectException(ResponseExceptionEnum.PASSWORD_INCORRECT);
 		}
