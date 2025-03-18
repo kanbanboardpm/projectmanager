@@ -76,6 +76,7 @@ public class CardService {
         return new GetCardDetailResponseDto(card);
     }
 
+
     @Transactional
     public void updateCard(UpdateCardRequestDto requestDto, User user, Long cardId) {
         Card card = cardRepository.findByIdAndUserId(cardId, user.getId()).orElseThrow(
