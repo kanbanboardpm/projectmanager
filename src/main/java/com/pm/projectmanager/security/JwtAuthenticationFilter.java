@@ -1,6 +1,7 @@
 package com.pm.projectmanager.security;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 import java.io.IOException;
 
@@ -11,8 +12,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pm.projectmanager.common.RedisService;
+import com.pm.projectmanager.common.response.ResponseExceptionEnum;
+import com.pm.projectmanager.domain.user.User;
+import com.pm.projectmanager.domain.user.UserRepository;
 import com.pm.projectmanager.domain.user.dto.LoginRequestDto;
 import com.pm.projectmanager.domain.user.dto.LoginResponseDto;
+import com.pm.projectmanager.exception.UserDeletedException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -57,22 +62,32 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res,
         FilterChain chain, Authentication authResult) throws IOException {
         log.info("인증 성공 및 JWT 생성");
-        String email = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
 
-        String accessToken = jwtProvider.createAccessToken(email);
-        String refreshToken = jwtProvider.createRefreshToken(email);
+        UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
+        String email = userDetails.getUsername();
+        User user = userDetails.getUser();
 
-        res.setHeader(AUTHORIZATION_HEADER, accessToken);
-        // jwtProvider.addJwtToCookie(accessToken, res);
-        redisService.saveRefreshToken(email, refreshToken);
+        LoginResponseDto responseDto;
+        if (user.getIsDeleted() != null) {
+            res.setStatus(SC_UNAUTHORIZED);
+            responseDto = new LoginResponseDto("탈퇴된 유저입니다.");
+        } else {
+            res.setStatus(SC_OK);
+            String accessToken = jwtProvider.createAccessToken(email);
+            String refreshToken = jwtProvider.createRefreshToken(email);
 
-        res.setStatus(SC_OK);
+            res.setHeader(AUTHORIZATION_HEADER, accessToken);
+            redisService.saveRefreshToken(email, refreshToken);
+
+            responseDto = new LoginResponseDto(accessToken);
+        }
         res.setCharacterEncoding("UTF-8");
         res.setContentType("application/json");
 
-        String jsonResponse = new ObjectMapper().writeValueAsString(new LoginResponseDto(accessToken));
-        res.getWriter().write(jsonResponse);
+        ObjectMapper objectMapper = new ObjectMapper();
+        res.getWriter().write(objectMapper.writeValueAsString(responseDto));
     }
+
 
 
     @Override

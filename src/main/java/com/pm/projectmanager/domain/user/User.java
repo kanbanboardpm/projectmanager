@@ -1,5 +1,7 @@
 package com.pm.projectmanager.domain.user;
 
+import java.time.LocalDateTime;
+
 import com.pm.projectmanager.common.TimeStamp;
 
 import jakarta.persistence.Column;
@@ -40,6 +42,8 @@ public class User extends TimeStamp {
 	@Column(length = 4000)
 	private String photoUrl;
 
+	private LocalDateTime isDeleted;
+
 	@Builder
 	public User(String email, String password, String nickname, String photoUrl) {
 		this.email = email;
@@ -55,5 +59,9 @@ public class User extends TimeStamp {
 
 	public void updatePassword(String password) {
 		this.password = password;
+	}
+
+	public void withdraw(LocalDateTime isDeleted) {
+		this.isDeleted = isDeleted;
 	}
 }

@@ -119,8 +119,12 @@ public class ProjectService {
 			throw new UserRoleException(ResponseExceptionEnum.ADMIN_ROLE_REQUIRED);
 		}
 
-		project.updateName(requestDto.getName());
-		project.updateColor(requestDto.getColor());
+		if (requestDto.getName() != null) {
+			project.updateName(requestDto.getName());
+		}
+		if (requestDto.getColor() != null) {
+			project.updateColor(requestDto.getColor());
+		}
 
 		projectRepository.save(project);
 	}
@@ -238,7 +242,7 @@ public class ProjectService {
 
 	@Transactional
 	public void deleteUser(Long projectId, UserDetailsImpl userDetails, Long userId) {
-
+		String string = "asd";
 		authorityCheck(projectId, userDetails);
 		authorityRepository.delete(authorityRepository.findByProjectIdAndUserId(projectId, userId));
 	}
