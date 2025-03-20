@@ -15,6 +15,7 @@ import com.pm.projectmanager.domain.authority.UserRole;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.comment.CommentRepository;
 import com.pm.projectmanager.domain.notification.CommentNotificationDto;
+import com.pm.projectmanager.domain.notification.NotificationService;
 import com.pm.projectmanager.domain.notification.dto.InviteResponseDto;
 import com.pm.projectmanager.domain.notification.dto.RoleChangeResponseDto;
 import com.pm.projectmanager.domain.project.Project;
@@ -123,14 +124,14 @@ public class RedisService {
 		}
 	}
 
-    public void commentNotifications(Long cardMasterUser,
+    public void commentNotifications(Long userId,
                                      String cardMasterNickName,
                                      String projectName,
                                      String cardName,
                                      String nickName,
                                      String content) throws JsonProcessingException
     {
-        String key = "notification:" + cardMasterUser;
+        String key = "notification:" + userId;
 
 		// 현재 날짜와 시간 가져오기
 		LocalDateTime now = LocalDateTime.now();
@@ -149,6 +150,7 @@ public class RedisService {
 
     public List<CommentNotificationDto> getCommentNotifications(Long cardMasterUser) throws JsonProcessingException {
         String key = "notification:" + cardMasterUser;
+		clearNotificationCount(cardMasterUser);
 
         // Redis 리스트에서 전체 데이터 가져오기
         List<String> jsonList = redisTemplate.opsForList().range(key, 0, -1);
@@ -161,6 +163,7 @@ public class RedisService {
                 notifications.add(notification);
             }
         }
+		clearNotificationCount(cardMasterUser);
         return notifications;
     }
 
@@ -187,8 +190,8 @@ public class RedisService {
 
     }
 
-    public void updateCommentNotificationStatusChecked(Long cardMasterUserId, String notificationId) throws JsonProcessingException {
-        String key = "notification:" + cardMasterUserId;
+    public void updateCommentNotificationStatusChecked(Long userId, String notificationId) throws JsonProcessingException {
+        String key = "notification:" + userId;
 
         // 현재 Redis에 저장된 모든 알림 가져오기
         List<String> jsonList = redisTemplate.opsForList().range(key, 0, -1);
@@ -266,5 +269,35 @@ public class RedisService {
 			}
 		}
 		return roleChangeList;
+	}
+
+	public void increaseNotificationCount(Long userId) {
+		String key = "notificationCount:" + userId;
+
+		String value = redisTemplate.opsForValue().get(key);
+		int intValue = 0;
+		try {
+			intValue = Integer.parseInt(value);
+		} catch (NumberFormatException e) {
+			intValue = 0;
+		}
+		intValue++;
+		redisTemplate.opsForValue().set(key, String.valueOf(intValue));
+	}
+
+	private void clearNotificationCount(Long userId) {
+		String key = "notificationCount:" + userId;
+		redisTemplate.delete(key);
+	}
+
+	public int getNotificationCount(Long userId) {
+		String key = "notificationCount:" + userId;
+		String count = redisTemplate.opsForValue().get(key);
+		if (count != null) {
+			return Integer.parseInt(count);
+		} else {
+			return 0;
+		}
+
 	}
 }
