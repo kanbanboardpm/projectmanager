@@ -64,5 +64,5 @@ jobs:
               sudo docker rm $CONTAINER_ID
             fi
             
-            sudo docker pull gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
+            sudo -E docker pull gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
             sudo docker compose up -d
