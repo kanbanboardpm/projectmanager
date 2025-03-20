@@ -9,6 +9,7 @@ import com.pm.projectmanager.domain.card.CardRepository;
 import com.pm.projectmanager.domain.comment.dto.CreateCommentRequestDto;
 import com.pm.projectmanager.domain.comment.dto.SelectAllCommentResponseDto;
 import com.pm.projectmanager.domain.comment.dto.UpdateCommentRequestDto;
+import com.pm.projectmanager.domain.notification.NotificationService;
 import com.pm.projectmanager.domain.project.ProjectService;
 import com.pm.projectmanager.domain.user.User;
 import com.pm.projectmanager.domain.user.UserRepository;
@@ -31,6 +32,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final RedisService redisService;
     private final AuthorityService authorityService;
+    private final NotificationService notificationService;
 
     public void createComment(CreateCommentRequestDto requestDto, User user, Long cardId) throws JsonProcessingException {
         Card card = cardRepository.findById(cardId).orElseThrow(
@@ -46,6 +48,7 @@ public class CommentService {
                 () -> new UserNotFoundException(ResponseExceptionEnum.USER_NOT_FOUND)
         );
         redisService.commentNotifications(cardMasterUser.getId(), cardMasterUser.getNickname(), card.getSection().getProject().getName(), card.getTitle(), user.getNickname(), comment.getContent());
+        notificationService.increaseNotificationCount(cardMasterUser.getId());
     }
 
     public List<SelectAllCommentResponseDto> selectAllComment(User user, Long cardId) {
