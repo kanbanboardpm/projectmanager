@@ -52,8 +52,8 @@ public class NotificationController {
 
     @GetMapping("/count")
     public ResponseEntity<HttpResponseDto> getUncheckNotificationCount(
-            @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
-        int count = notificationService.getUncheckNotificationCount(userDetails.getUser().getId());
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        int count = notificationService.getNotificationCount(userDetails.getUser().getId());
         return of(NOTIFICATION_COUNT_SELECT_SUCCESS, count);
     }
 

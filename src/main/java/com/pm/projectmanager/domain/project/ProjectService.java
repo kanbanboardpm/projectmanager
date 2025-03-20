@@ -24,6 +24,7 @@ import com.pm.projectmanager.domain.authority.Authority;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.authority.AuthorityService;
 import com.pm.projectmanager.domain.comment.CommentRepository;
+import com.pm.projectmanager.domain.notification.NotificationService;
 import com.pm.projectmanager.domain.project.dto.ChangeRoleRequestDto;
 import com.pm.projectmanager.domain.project.dto.InviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
@@ -64,6 +65,7 @@ public class ProjectService {
 	private final UserRepository userRepository;
 	private final CardRepository cardRepository;
 	private final CommentRepository commentRepository;
+	private final NotificationService notificationService;
 
 	@Transactional
 	public ProjectCreateResponseDto create(ProjectCreateDto requestDto, UserDetailsImpl userDetails) {
@@ -201,6 +203,7 @@ public class ProjectService {
 				String inviteJson = objectMapper.writeValueAsString(inviteDto);
 
 				redisService.saveInvite(email, inviteJson);
+				notificationService.increaseNotificationCount(userId);
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException("초대 JSON 변환 중 오류 발생", e);
 			}

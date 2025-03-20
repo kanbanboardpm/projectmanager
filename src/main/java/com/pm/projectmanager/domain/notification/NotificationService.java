@@ -1,29 +1,12 @@
 package com.pm.projectmanager.domain.notification;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.springframework.stereotype.Service;
 
 import com.pm.projectmanager.common.RedisService;
-import com.pm.projectmanager.common.response.ResponseExceptionEnum;
-import com.pm.projectmanager.domain.notification.dto.InviteResponseDto;
-import com.pm.projectmanager.domain.notification.dto.RoleChangeResponseDto;
-import com.pm.projectmanager.domain.project.Project;
 import com.pm.projectmanager.domain.project.ProjectService;
-import com.pm.projectmanager.domain.project.dto.ProjectInviteResponseDto;
-import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
-import com.pm.projectmanager.domain.user.User;
 import com.pm.projectmanager.domain.user.UserRepository;
-import com.pm.projectmanager.domain.user.UserService;
-import com.pm.projectmanager.exception.UserNotFoundException;
-import com.pm.projectmanager.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 public class NotificationService {
 
 	private final RedisService redisService;
-	private final ProjectService projectService;
-	private final UserRepository userRepository;
 
 	// public List<ProjectInviteResponseDto> getInvites(UserDetailsImpl userDetails) {
 	// 	List<String> ids = redisService.getInvites(userDetails.getUsername());
@@ -72,6 +53,14 @@ public class NotificationService {
 
 	public int getUncheckNotificationCount(Long cardMasterUserId) throws JsonProcessingException {
 		return redisService.getUncheckNotificationCount(cardMasterUserId);
+	}
+
+	public int getNotificationCount(Long userId) {
+		return redisService.getNotificationCount(userId);
+	}
+
+	public void increaseNotificationCount(Long userId) {
+		redisService.increaseNotificationCount(userId);
 	}
 
 }
