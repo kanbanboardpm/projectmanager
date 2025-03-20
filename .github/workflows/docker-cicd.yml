@@ -5,7 +5,7 @@ on:
     branches: [ dev ]
 
 env:
-  DOCKER_IMAGE_TAG_NAME: projectmanager-backend-app
+  DOCKER_IMAGE_TAG_NAME: projectmanager-backend-app  # 환경변수 설정
 
 jobs:
   build-and-docker-push:
@@ -27,7 +27,7 @@ jobs:
         run: ./gradlew clean build
 
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
+        run: docker build . --file Dockerfile --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest  # GCP 프로젝트 환경변수 적용
 
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v1
@@ -38,7 +38,7 @@ jobs:
         run: gcloud auth configure-docker
 
       - name: Push the Docker image to Google Container Registry (GCR)
-        run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
+        run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest  # Docker 이미지를 GCR로 푸시
 
   deploy-to-gce:
     needs: build-and-docker-push
