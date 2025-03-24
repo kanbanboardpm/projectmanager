@@ -44,7 +44,7 @@ public class UserService {
 		String imageUrl = "https://img1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/7r5X/image/9djEiPBPMLu_IvCYyvRPwmZkM1g.jpg";
 
 		User user = new User(requestDto.getEmail(), encodedPassword,
-			requestDto.getNickname(), imageUrl);
+			requestDto.getNickname(), imageUrl, null);
 		userRepository.save(user);
 	}
 

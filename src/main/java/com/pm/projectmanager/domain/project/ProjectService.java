@@ -203,7 +203,7 @@ public class ProjectService {
 				String inviteJson = objectMapper.writeValueAsString(inviteDto);
 
 				redisService.saveInvite(email, inviteJson);
-				notificationService.increaseNotificationCount(userId);
+				notificationService.increaseNotificationCount(user.getId());
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException("초대 JSON 변환 중 오류 발생", e);
 			}
@@ -268,6 +268,7 @@ public class ProjectService {
 		authority.updateRole(requestDto.getRole());
 		redisService.roleChangeNotifications(targetUser.getId(), requestDto.getRole(), projectId);
 		authorityRepository.save(authority);
+		notificationService.increaseNotificationCount(targetUser.getId());
 	}
 
 	public List<Project> getProjects(List<Long> ids) {

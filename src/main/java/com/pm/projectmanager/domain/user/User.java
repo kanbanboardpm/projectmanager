@@ -44,12 +44,15 @@ public class User extends TimeStamp {
 
 	private LocalDateTime isDeleted;
 
+	private Long kakaoId;
+
 	@Builder
-	public User(String email, String password, String nickname, String photoUrl) {
+	public User(String email, String password, String nickname, String photoUrl, Long kakaoId) {
 		this.email = email;
 		this.password = password;
 		this.nickname = nickname;
 		this.photoUrl = photoUrl;
+		this.kakaoId = kakaoId;
 	}
 
 	public void update(String nickname, String photoUrl) {
@@ -63,5 +66,9 @@ public class User extends TimeStamp {
 
 	public void withdraw(LocalDateTime isDeleted) {
 		this.isDeleted = isDeleted;
+	}
+
+	public void updateKakaoId(Long kakaoId) {
+		this.kakaoId = kakaoId;
 	}
 }
