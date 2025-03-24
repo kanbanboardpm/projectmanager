@@ -47,8 +47,10 @@ public class CommentService {
         User cardMasterUser = userRepository.findById(card.getUser().getId()).orElseThrow(
                 () -> new UserNotFoundException(ResponseExceptionEnum.USER_NOT_FOUND)
         );
+        if (!card.getUser().getId().equals(user.getId())) {
+            notificationService.increaseNotificationCount(cardMasterUser.getId());
+        }
         redisService.commentNotifications(cardMasterUser.getId(), cardMasterUser.getNickname(), card.getSection().getProject().getName(), card.getTitle(), user.getNickname(), comment.getContent());
-        notificationService.increaseNotificationCount(cardMasterUser.getId());
     }
 
     public List<SelectAllCommentResponseDto> selectAllComment(User user, Long cardId) {
