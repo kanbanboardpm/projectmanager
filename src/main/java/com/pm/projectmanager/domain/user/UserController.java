@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pm.projectmanager.common.response.HttpResponseDto;
 import com.pm.projectmanager.domain.user.dto.UpdateRequestDto;
 import com.pm.projectmanager.domain.user.dto.SignupRequestDto;
@@ -18,6 +20,7 @@ import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.domain.user.dto.WithdrawRequestDto;
 import com.pm.projectmanager.security.UserDetailsImpl;
 
+import static com.pm.projectmanager.common.response.ResponseCodeEnum.LOGIN_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_DELETE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_GET_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_LOGOUT_SUCCESS;
@@ -27,6 +30,7 @@ import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_SIGNUP
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.USER_UPDATE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseUtils.of;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +40,7 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
 	private final UserService userService;
+	private final KakaoService kakaoService;
 
 	@PostMapping
 	public ResponseEntity<HttpResponseDto> signup(
@@ -95,5 +100,11 @@ public class UserController {
 	) {
 		UserResponseDto responseDto = userService.get(userDetails);
 		return of(USER_GET_SUCCESS, responseDto);
+	}
+
+	@PostMapping("/oauth/kakao")
+	public ResponseEntity<HttpResponseDto> kakaoLogin(@RequestParam String code, HttpServletResponse res)
+		throws JsonProcessingException {
+		return of(LOGIN_SUCCESS, kakaoService.kakaoLogin(code, res));
 	}
 }
