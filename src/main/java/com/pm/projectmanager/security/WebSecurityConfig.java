@@ -97,7 +97,7 @@ public class WebSecurityConfig {
 
 		http.authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
 			.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-			.requestMatchers("/api/users", "/api/users/login").permitAll()
+			.requestMatchers("/api/users", "/api/users/login", "/api/users/oauth/kakao").permitAll()
 			.requestMatchers("/css/**", "/js/**").permitAll()
 			.anyRequest().permitAll()
 		);

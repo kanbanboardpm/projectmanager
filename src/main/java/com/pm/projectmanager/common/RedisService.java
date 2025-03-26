@@ -271,6 +271,7 @@ public class RedisService {
 		return roleChangeList;
 	}
 
+	// 댓글이 달릴 때
 	public void increaseNotificationCount(Long userId) {
 		String key = "notificationCount:" + userId;
 
@@ -285,11 +286,13 @@ public class RedisService {
 		redisTemplate.opsForValue().set(key, String.valueOf(intValue));
 	}
 
+	// 알림페이지를 들어가서 카운트가 없어질 때
 	private void clearNotificationCount(Long userId) {
 		String key = "notificationCount:" + userId;
 		redisTemplate.delete(key);
 	}
 
+	// 사이드탭에서 알림 카운트를 가져올 때
 	public int getNotificationCount(Long userId) {
 		String key = "notificationCount:" + userId;
 		String count = redisTemplate.opsForValue().get(key);
