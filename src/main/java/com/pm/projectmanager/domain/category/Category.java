@@ -2,7 +2,7 @@ package com.pm.projectmanager.domain.category;
 
 import com.pm.projectmanager.common.Color;
 import com.pm.projectmanager.domain.project.Project;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
