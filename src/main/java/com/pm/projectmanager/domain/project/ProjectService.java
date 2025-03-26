@@ -160,6 +160,7 @@ public class ProjectService {
 
 	@Transactional
 	public void invite(Long projectId, List<String> emails, Long userId) {
+
 		if (!projectRepository.existsById(projectId)) {
 			throw new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND);
 		}

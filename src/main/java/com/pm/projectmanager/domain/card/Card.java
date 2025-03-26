@@ -4,7 +4,6 @@ import com.pm.projectmanager.domain.card.dto.UpdateCardRequestDto;
 import com.pm.projectmanager.domain.category.Category;
 import com.pm.projectmanager.domain.section.Section;
 import com.pm.projectmanager.domain.user.User;
-import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +11,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import javax.persistence.*;
 
 @Entity
 @Getter

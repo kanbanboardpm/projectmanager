@@ -1,10 +1,11 @@
 package com.pm.projectmanager.domain.authority;
 
+import javax.persistence.Entity;
+
 import com.pm.projectmanager.domain.project.Project;
 import com.pm.projectmanager.domain.user.User;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;

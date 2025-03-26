@@ -34,29 +34,58 @@ dependencies {
     compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
+
     // MySQL
     runtimeOnly 'com.mysql:mysql-connector-j'
+
     // JPA
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
     // Spring Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     testImplementation 'org.springframework.security:spring-security-test'
+
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'io.projectreactor:reactor-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'it.ozimov:embedded-redis:0.7.2'
-    // swagger
+
+    // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
-    // env
+
+    // Env
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
-    // validation
+
+    // Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // QueryDSL
+    implementation "com.querydsl:querydsl-jpa:5.0.0"
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0"
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jpa"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "javax.persistence:javax.persistence-api:2.2"
+    compileOnly "javax.persistence:javax.persistence-api:2.2"
+
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'it.ozimov:embedded-redis:0.7.2'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+def querydslDir = "$buildDir/generated/querydsl"
+
+sourceSets {
+    main {
+        java {
+            srcDirs += querydslDir
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
 }
