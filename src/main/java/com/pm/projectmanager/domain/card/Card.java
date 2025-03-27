@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Getter
