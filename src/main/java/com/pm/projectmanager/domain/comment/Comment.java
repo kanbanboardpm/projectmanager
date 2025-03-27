@@ -4,7 +4,7 @@ import com.pm.projectmanager.common.TimeStamp;
 import com.pm.projectmanager.domain.card.Card;
 import com.pm.projectmanager.domain.comment.dto.UpdateCommentRequestDto;
 import com.pm.projectmanager.domain.user.User;
-import javax.persistence.*;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

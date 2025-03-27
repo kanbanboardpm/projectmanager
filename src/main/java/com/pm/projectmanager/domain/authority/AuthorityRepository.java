@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.pm.projectmanager.domain.project.Project;
 import com.pm.projectmanager.domain.user.User;
 
-public interface AuthorityRepository extends JpaRepository<Authority, Long> {
+public interface AuthorityRepository extends JpaRepository<Authority, Long>, AuthorityRepositoryCustom {
 
 	boolean existsByProjectIdAndUserId(Long projectId, Long userId);
 

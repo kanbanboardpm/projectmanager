@@ -2,16 +2,10 @@ package com.pm.projectmanager.domain.user;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.Entity;
+import jakarta.persistence.*;
 
 import com.pm.projectmanager.common.TimeStamp;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import lombok.AccessLevel;
 import lombok.Builder;
