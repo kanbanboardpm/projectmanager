@@ -144,9 +144,11 @@ public class KakaoService {
 			.get("nickname").asText();
 		String email = jsonNode.get("kakao_account")
 			.get("email").asText();
+		String picture = jsonNode.get("properties")
+			.get("profile_image").asText();
 
 		log.info("카카오 사용자 정보: {}, {}, {}", id, email, nickname);
-		return new KakaoUserInfoDto(id, nickname, email);
+		return new KakaoUserInfoDto(id, nickname, email, picture);
 	}
 
 	private User registerKakaoUserIfNeeded(KakaoUserInfoDto kakaoUserInfo) {
@@ -174,7 +176,7 @@ public class KakaoService {
 					.nickname(kakaoUserInfo.getNickname())
 					.kakaoId(kakaoId)
 					.password(encodedPassword)
-					.photoUrl("https://img1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/7r5X/image/9djEiPBPMLu_IvCYyvRPwmZkM1g.jpg")
+					.photoUrl(kakaoUserInfo.getPicture())
 					.build();
 			}
 
