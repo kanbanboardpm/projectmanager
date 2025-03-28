@@ -19,6 +19,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
@@ -41,8 +42,9 @@ public class KakaoService {
 	private final RestTemplate restTemplate;
 	private final JwtProvider jwtProvider;
 	private final RedisService redisService;
-
 	public static final String AUTHORIZATION_HEADER = "Authorization";
+	@Value("${kakao-redirect-uri}")
+	public String redirectUri;
 
 	public KakaoLoginResponseDto kakaoLogin(String code, HttpServletResponse res) throws JsonProcessingException {
 		// 1. "인가 코드"로 "액세스 토큰" 요청
@@ -88,7 +90,7 @@ public class KakaoService {
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 		body.add("grant_type", "authorization_code");
 		body.add("client_id", "8e22992753126ab9570304abe3af042e");
-		body.add("redirect_uri", "http://projectmanager2025.store/oauth/kakao");
+		body.add("redirect_uri", redirectUri);
 		body.add("code", code); // 우리가 이전에 받아온 인가코드
 
 		RequestEntity<MultiValueMap<String, String>> requestEntity = RequestEntity
