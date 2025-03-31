@@ -43,12 +43,10 @@ public class KakaoService {
 	private final JwtProvider jwtProvider;
 	private final RedisService redisService;
 	public static final String AUTHORIZATION_HEADER = "Authorization";
-	@Value("${kakao-redirect-uri}")
-	public String redirectUri;
 
-	public KakaoLoginResponseDto kakaoLogin(String code, HttpServletResponse res) throws JsonProcessingException {
+	public KakaoLoginResponseDto kakaoLogin(String code, String uri, HttpServletResponse res) throws JsonProcessingException {
 		// 1. "인가 코드"로 "액세스 토큰" 요청
-		String tokens = getToken(code);
+		String tokens = getToken(code, uri);
 
 		String KakaoAccessToken = tokens.split(" ")[0];
 
@@ -73,7 +71,7 @@ public class KakaoService {
 	}
 
 	// 인가 코드 받는 메서드
-	public String getToken(String code) throws JsonProcessingException {
+	public String getToken(String code, String redirectUri) throws JsonProcessingException {
 		// 요청 URL 만들기
 		URI uri = UriComponentsBuilder
 			.fromUriString("https://kauth.kakao.com")
