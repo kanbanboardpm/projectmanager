@@ -171,8 +171,11 @@ public class ProjectService {
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		List<User> users = userRepository.findByEmailInOrNicknameIn(emails, emails);
-		Map<String, User> userMap = users.stream()
+		System.out.println(users);
+		Map<String, User> emailMap = users.stream()
 			.collect(Collectors.toMap(User::getEmail, user -> user));
+		Map<String, User> nicknameMap = users.stream()
+			.collect(Collectors.toMap(User::getNickname, user -> user));
 
 		List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
 		List<Authority> authorities = authorityRepository.findByProjectIdAndUserIdIn(projectId, userIds);
@@ -180,8 +183,11 @@ public class ProjectService {
 			.map(authority -> authority.getUser().getId())
 			.collect(Collectors.toSet());
 
-		for (String email : emails) {
-			User user = userMap.get(email);
+		for (String value : emails) {
+			User user = emailMap.get(value);
+			if (user == null) {
+				user = nicknameMap.get(value);
+			}
 			if (user == null) {
 				throw new UserNotFoundException(ResponseExceptionEnum.USER_NOT_FOUND);
 			}
@@ -190,7 +196,7 @@ public class ProjectService {
 				throw new AuthorityAlreadyExistsException(ResponseExceptionEnum.AUTHORITY_ALREADY_EXISTS);
 			}
 
-			List<ProjectInviteResponseDto> existingInvites = redisService.getInvites(email);
+			List<ProjectInviteResponseDto> existingInvites = redisService.getInvites(user.getEmail());
 			if (existingInvites != null) {
 				for (ProjectInviteResponseDto inviteDto : existingInvites) {
 					if (inviteDto.getId().equals(projectId)) {
@@ -203,7 +209,7 @@ public class ProjectService {
 				InviteDto inviteDto = new InviteDto(projectId, userId);
 				String inviteJson = objectMapper.writeValueAsString(inviteDto);
 
-				redisService.saveInvite(email, inviteJson);
+				redisService.saveInvite(user.getEmail(), inviteJson);
 				notificationService.increaseNotificationCount(user.getId());
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException("초대 JSON 변환 중 오류 발생", e);
