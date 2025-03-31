@@ -61,6 +61,7 @@ public enum ResponseCodeEnum {
     UPDATE_COMMENT_NOTIFICATION_STATUS_CHECK(HttpStatus.OK, "댓글 알림 확인 성공"),
     NOTIFICATION_COUNT_SELECT_SUCCESS(HttpStatus.OK, "알림 갯수 조회 성공"),
 	ROLE_CHANGE_GET_SUCCESS(HttpStatus.OK, "권한 변경 알림 조회 성공"),
+	DELETE_ROLE_CHANGE_NOTIFICATION(HttpStatus.OK, "권한 변경 알림 삭제 성공"),
     DELETE_COMMENT_NOTIFICATION(HttpStatus.OK, "알림 삭제 성공");
 
 	private final HttpStatus httpStatus;
