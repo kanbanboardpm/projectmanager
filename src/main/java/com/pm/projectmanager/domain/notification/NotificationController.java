@@ -70,4 +70,13 @@ public class NotificationController {
         List<RoleChangeResponseDto> changes = redisService.getRoleChangeNotifications(userDetails.getUser().getId());
         return of(ROLE_CHANGE_GET_SUCCESS, changes);
     }
+
+    @DeleteMapping("/roles")
+    public ResponseEntity<HttpResponseDto> deleteRoleChanges(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @RequestBody RoleChangeResponseDto responseDto
+    ) {
+        notificationService.deleteRoleChangeNotification(userDetails, responseDto);
+        return of(DELETE_ROLE_CHANGE_NOTIFICATION);
+    }
 }

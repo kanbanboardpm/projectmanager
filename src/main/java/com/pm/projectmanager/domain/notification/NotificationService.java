@@ -5,8 +5,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.stereotype.Service;
 
 import com.pm.projectmanager.common.RedisService;
+import com.pm.projectmanager.domain.notification.dto.RoleChangeResponseDto;
 import com.pm.projectmanager.domain.project.ProjectService;
 import com.pm.projectmanager.domain.user.UserRepository;
+import com.pm.projectmanager.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -63,4 +65,7 @@ public class NotificationService {
 		redisService.increaseNotificationCount(userId);
 	}
 
+	public void deleteRoleChangeNotification(UserDetailsImpl userDetails, RoleChangeResponseDto responseDto) {
+		redisService.deleteRoleChangeNotification(userDetails.getUser(), responseDto);
+	}
 }

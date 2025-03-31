@@ -303,4 +303,11 @@ public class RedisService {
 		}
 
 	}
+
+	public void deleteRoleChangeNotification(User user, RoleChangeResponseDto responseDto) {
+
+		redisTemplate.opsForList().remove("roleNotification:" + user.getId(), 0, responseDto.getRole());
+
+
+	}
 }

@@ -103,8 +103,12 @@ public class UserController {
 	}
 
 	@GetMapping("/oauth/kakao")
-	public ResponseEntity<HttpResponseDto> kakaoLogin(@RequestParam String code, HttpServletResponse res)
+	public ResponseEntity<HttpResponseDto> kakaoLogin(
+		@RequestParam String code,
+		@RequestParam String uri,
+		HttpServletResponse res
+		)
 		throws JsonProcessingException {
-		return of(LOGIN_SUCCESS, kakaoService.kakaoLogin(code, res));
+		return of(LOGIN_SUCCESS, kakaoService.kakaoLogin(code, uri, res));
 	}
 }
