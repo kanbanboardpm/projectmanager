@@ -170,7 +170,7 @@ public class ProjectService {
 
 		ObjectMapper objectMapper = new ObjectMapper();
 
-		List<User> users = userRepository.findByEmailIn(emails);
+		List<User> users = userRepository.findByEmailOrNicknameIn(emails, emails);
 		Map<String, User> userMap = users.stream()
 			.collect(Collectors.toMap(User::getEmail, user -> user));
 

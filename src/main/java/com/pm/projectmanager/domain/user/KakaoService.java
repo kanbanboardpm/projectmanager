@@ -145,7 +145,6 @@ public class KakaoService {
 		String picture = jsonNode.get("properties")
 			.get("profile_image").asText();
 
-		log.info("카카오 사용자 정보: {}, {}, {}", id, email, nickname);
 		return new KakaoUserInfoDto(id, nickname, email, picture);
 	}
 

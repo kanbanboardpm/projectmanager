@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import com.pm.projectmanager.common.TimeStamp;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,6 +33,7 @@ public class User extends TimeStamp {
 	@Column(nullable = false)
 	private String password;
 
+	@Pattern(regexp = "^[가-힣a-zA-Z0-9]+$", message = "닉네임은 한글, 영문, 숫자만 사용할 수 있습니다.")
 	@Column(nullable = false)
 	private String nickname;
 
