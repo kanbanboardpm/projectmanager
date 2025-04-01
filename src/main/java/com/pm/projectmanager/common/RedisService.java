@@ -305,8 +305,13 @@ public class RedisService {
 	}
 
 	public void deleteRoleChangeNotification(User user, RoleChangeResponseDto responseDto) {
+		try {
+			String roleChangeJson = objectMapper.writeValueAsString(responseDto);
+			redisTemplate.opsForList().remove("roleNotification:" + user.getId(), 0, roleChangeJson);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
 
-		redisTemplate.opsForList().remove("roleNotification:" + user.getId(), 0, responseDto.getRole());
 
 
 	}
