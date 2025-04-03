@@ -67,6 +67,9 @@ dependencies {
 
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'it.ozimov:embedded-redis:0.7.2'
+
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter', version: '1.2.5.RELEASE'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-storage', version: '1.2.5.RELEASE'
 }
 
 tasks.named('test') {
