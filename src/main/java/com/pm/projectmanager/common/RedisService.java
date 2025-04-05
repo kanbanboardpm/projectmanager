@@ -3,9 +3,7 @@ package com.pm.projectmanager.common;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -13,19 +11,23 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pm.projectmanager.domain.authority.UserRole;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
-import com.pm.projectmanager.domain.comment.CommentRepository;
 import com.pm.projectmanager.domain.notification.CommentNotificationDto;
-import com.pm.projectmanager.domain.notification.NotificationService;
-import com.pm.projectmanager.domain.notification.dto.InviteResponseDto;
 import com.pm.projectmanager.domain.notification.dto.RoleChangeResponseDto;
+import com.pm.projectmanager.domain.project.InviteCodeGenerator;
 import com.pm.projectmanager.domain.project.Project;
 import com.pm.projectmanager.domain.project.ProjectRepository;
+import com.pm.projectmanager.domain.project.dto.InviteCodeRequestDto;
+import com.pm.projectmanager.domain.project.dto.InviteCodeResponseDto;
 import com.pm.projectmanager.domain.project.dto.InviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteResponseDto;
 import com.pm.projectmanager.domain.user.User;
 import com.pm.projectmanager.domain.user.UserRepository;
 
+import com.pm.projectmanager.exception.NoInviteException;
 import com.pm.projectmanager.exception.NotificationNotFoundException;
+import com.pm.projectmanager.exception.ProjectNullException;
+import com.pm.projectmanager.security.UserDetailsImpl;
+
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -311,8 +313,33 @@ public class RedisService {
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
+	}
 
+	public String createInviteCode(Long projectId, UserDetailsImpl userDetails) {
+		InviteCodeGenerator generator = new InviteCodeGenerator(redisTemplate);
+		String code = generator.generateUniqueCode();
+		Project project = projectRepository.findById(projectId).orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
+		String projectName = project.getName();
+		InviteCodeRequestDto requestDto = new InviteCodeRequestDto(projectId, projectName, userDetails.getUser().getNickname());
+		try {
+			String inviteCodeJson = objectMapper.writeValueAsString(requestDto);
+			redisTemplate.opsForValue().set("InviteCode:"+code, inviteCodeJson, 24 * 60 * 60, TimeUnit.SECONDS);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
+		return code;
+	}
 
-
+	public InviteCodeResponseDto getInviteCode(String code) {
+		String responseJson = redisTemplate.opsForValue().get("InviteCode:"+code);
+		if (responseJson != null) {
+			try {
+				return objectMapper.readValue(responseJson, InviteCodeResponseDto.class);
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			throw new NoInviteException(ResponseExceptionEnum.NO_INVITE_EXCEPTION);
+		}
 	}
 }

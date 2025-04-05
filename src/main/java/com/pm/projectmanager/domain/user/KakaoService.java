@@ -5,6 +5,8 @@ import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pm.projectmanager.aop.activityLog.ActionType;
+import com.pm.projectmanager.aop.activityLog.LogActivity;
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.domain.authority.UserRole;
 import com.pm.projectmanager.domain.user.dto.KakaoLoginResponseDto;
@@ -148,6 +150,7 @@ public class KakaoService {
 		return new KakaoUserInfoDto(id, nickname, email, picture);
 	}
 
+	@LogActivity(value = ActionType.USER, detail = "카카오 유저 생성: #{#kakaoUserInfo.email}")
 	private User registerKakaoUserIfNeeded(KakaoUserInfoDto kakaoUserInfo) {
 		// DB 에 중복된 Kakao Id 가 있는지 확인
 		Long kakaoId = kakaoUserInfo.getId();
