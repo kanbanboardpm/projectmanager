@@ -299,5 +299,14 @@ public class ProjectService {
 
 		return redisService.getInviteCode(code);
 	}
+
+	@Transactional
+	public void inviteCodeAccept(Long projectId, UserDetailsImpl userDetails) {
+		Project project = projectRepository.findById(projectId).orElseThrow(() -> new ProjectNullException(ResponseExceptionEnum.PROJECT_NOT_FOUND));
+		if (authorityRepository.existsByProjectIdAndUserId(project.getId(), userDetails.getUser().getId())) {
+			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_ALREADY_EXISTS);
+		}
+		authorityService.create(project, userDetails.getUser(), UserRole.USER);
+	}
 }
 

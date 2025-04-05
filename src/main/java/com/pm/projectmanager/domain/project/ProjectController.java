@@ -41,6 +41,7 @@ import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUserResponseDto;
+import com.pm.projectmanager.domain.user.User;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.security.UserDetailsImpl;
 
@@ -171,5 +172,14 @@ public class ProjectController {
 	) {
 		InviteCodeResponseDto responseDto = projectService.inviteCodeGet(code);
 		return of(PROJECT_INVITE_CODE_GET_SUCCESS, responseDto);
+	}
+
+	@PostMapping("/invites/code/{projectId}/accept")
+	public ResponseEntity<HttpResponseDto> inviteCodeAccept(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable Long projectId
+	) {
+		projectService.inviteCodeAccept(projectId, userDetails);
+		return of(PROJECT_ACCEPT_SUCCESS);
 	}
 }
