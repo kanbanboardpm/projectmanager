@@ -1,15 +1,9 @@
 package com.pm.projectmanager.domain.user;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pm.projectmanager.common.response.HttpResponseDto;
@@ -33,6 +27,9 @@ import static com.pm.projectmanager.common.response.ResponseUtils.of;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -60,10 +57,11 @@ public class UserController {
 
 	@PutMapping
 	public ResponseEntity<HttpResponseDto> update(
-		@Valid @RequestBody UpdateRequestDto requestDto,
+        @RequestPart("nickname") String nickname,
+        @RequestPart(value = "image", required = false) MultipartFile image,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
-	) {
-		userService.update(requestDto, userDetails);
+	) throws IOException {
+		userService.update(nickname, userDetails, image);
 		return of(USER_UPDATE_SUCCESS);
 	}
 

@@ -1,7 +1,9 @@
 package com.pm.projectmanager.domain.user;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
+import com.pm.projectmanager.common.gcs.GoogleCloudStorageService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +11,6 @@ import com.pm.projectmanager.aop.activityLog.ActionType;
 import com.pm.projectmanager.aop.activityLog.LogActivity;
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
-import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.user.dto.UpdateRequestDto;
 import com.pm.projectmanager.domain.user.dto.SignupRequestDto;
 import com.pm.projectmanager.domain.user.dto.PasswordRequestDto;
@@ -21,6 +22,7 @@ import com.pm.projectmanager.security.UserDetailsImpl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 	private final UserRepository userRepository;
 	private final RedisService redisService;
-	private final AuthorityRepository authorityRepository;
+    private final GoogleCloudStorageService googleCloudStorageService;
 
 	@Transactional
 	public void signup(SignupRequestDto requestDto) {
@@ -56,14 +58,15 @@ public class UserService {
 
 	@Transactional
 	@LogActivity(value = ActionType.USER, detail = "유저 수정: #{#requestDto.nickname}")
-	public void update(UpdateRequestDto requestDto, UserDetailsImpl userDetails) {
+	public void update(String nickname, UserDetailsImpl userDetails, MultipartFile image) throws IOException {
 
-		if (!requestDto.getNickname().equals(userDetails.getUser().getNickname()) && userRepository.existsByNickname(requestDto.getNickname())) {
+		if (!nickname.equals(userDetails.getUser().getNickname()) && userRepository.existsByNickname(nickname)) {
 			throw new UserAlreadyExistsException(ResponseExceptionEnum.NICKNAME_ALREADY_EXISTS);
 		}
 
 		User user = userDetails.getUser();
-		user.update(requestDto.getNickname(), requestDto.getImage_url());
+        String imageUrl = googleCloudStorageService.uploadImage(image);
+		user.update(nickname, imageUrl);
 		userRepository.save(user);
 	}
 
