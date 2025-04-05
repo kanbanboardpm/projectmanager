@@ -6,6 +6,6 @@ public enum ActionType {
     SECTION,
     CARD,
     COMMENT,
-    MEMBER,
+    USER,
     ROLE
 }

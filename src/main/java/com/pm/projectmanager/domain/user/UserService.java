@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.pm.projectmanager.aop.activityLog.ActionType;
+import com.pm.projectmanager.aop.activityLog.LogActivity;
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
@@ -53,6 +55,7 @@ public class UserService {
 	}
 
 	@Transactional
+	@LogActivity(value = ActionType.USER, detail = "유저 수정: #{#requestDto.nickname}")
 	public void update(UpdateRequestDto requestDto, UserDetailsImpl userDetails) {
 
 		if (!requestDto.getNickname().equals(userDetails.getUser().getNickname()) && userRepository.existsByNickname(requestDto.getNickname())) {
@@ -71,6 +74,7 @@ public class UserService {
 	}
 
 	@Transactional
+	@LogActivity(value = ActionType.USER, detail = "비밀번호 수정: #{#user.username}")
 	public void updatePassword(PasswordRequestDto requestDto, UserDetailsImpl userDetails) {
 
 		User user = userDetails.getUser();
@@ -84,6 +88,7 @@ public class UserService {
 	}
 
 	@Transactional
+	@LogActivity(value = ActionType.USER, detail = "유저 탈퇴: #{#user.username}")
 	public void withdraw(WithdrawRequestDto requestDto, UserDetailsImpl userDetails) {
 
 		if (passwordEncoder.matches(requestDto.getPassword(), userDetails.getPassword())) {
