@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pm.projectmanager.aop.activityLog.ActionType;
+import com.pm.projectmanager.aop.activityLog.LogActivity;
 import com.pm.projectmanager.common.Color;
 import com.pm.projectmanager.domain.authority.UserRole;
 import com.pm.projectmanager.domain.card.Card;
@@ -26,6 +28,7 @@ import com.pm.projectmanager.domain.authority.AuthorityService;
 import com.pm.projectmanager.domain.comment.CommentRepository;
 import com.pm.projectmanager.domain.notification.NotificationService;
 import com.pm.projectmanager.domain.project.dto.ChangeRoleRequestDto;
+import com.pm.projectmanager.domain.project.dto.InviteCodeResponseDto;
 import com.pm.projectmanager.domain.project.dto.InviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateResponseDto;
@@ -68,6 +71,7 @@ public class ProjectService {
 	private final NotificationService notificationService;
 
 	@Transactional
+	@LogActivity(value = ActionType.PROJECT, detail = "프로젝트 생성: #{#requestDto.name}")
 	public ProjectCreateResponseDto create(ProjectCreateDto requestDto, UserDetailsImpl userDetails) {
 
 		Project project = Project.builder()
@@ -111,6 +115,7 @@ public class ProjectService {
 	}
 
 	@Transactional
+	@LogActivity(value = ActionType.PROJECT, detail = "프로젝트 수정: #{#requestDto.name}")
 	public void update(ProjectUpdateDto requestDto, UserDetailsImpl userDetails, Long projectId) {
 		authorityService.adminCheck(projectId, userDetails.getUser().getId());
 
@@ -132,6 +137,7 @@ public class ProjectService {
 	}
 
 	@Transactional
+	@LogActivity(value = ActionType.PROJECT, detail = "프로젝트 삭제: #{#projectId}")
 	public void delete(UserDetailsImpl userDetails, Long projectId) {
 		authorityService.adminCheck(projectId, userDetails.getUser().getId());
 
@@ -159,6 +165,7 @@ public class ProjectService {
 	}
 
 	@Transactional
+	@LogActivity(value = ActionType.PROJECT, detail = "프로젝트 초대: #{#projectId} 번 프로젝트에 #{#emails}")
 	public void invite(Long projectId, List<String> emails, Long userId) {
 
 		if (!projectRepository.existsById(projectId)) {
@@ -218,6 +225,7 @@ public class ProjectService {
 	}
 
 	@Transactional
+	@LogActivity(value = ActionType.PROJECT, detail = "프로젝트 초대 수락: #{#projectId}")
 	public void inviteAccept(Long projectId, UserDetailsImpl userDetails) {
 
 		if (redisService.checkInvite(userDetails.getUser().getEmail(), projectId)) {
@@ -232,6 +240,7 @@ public class ProjectService {
 	}
 
 	@Transactional
+	@LogActivity(value = ActionType.PROJECT, detail = "프로젝트 초대 거절: #{#projectId}")
 	public void inviteRefuse(Long projectId, UserDetailsImpl userDetails) {
 
 		if (redisService.checkInvite(userDetails.getUser().getEmail(), projectId)) {
@@ -251,18 +260,14 @@ public class ProjectService {
 	}
 
 	@Transactional
+	@LogActivity(value = ActionType.PROJECT, detail = "프로젝트 유저 제거: #{#projectId} 번 프로젝트에 #{#userId}")
 	public void deleteUser(Long projectId, UserDetailsImpl userDetails, Long userId) {
-		String string = "asd";
 		authorityCheck(projectId, userDetails);
 		authorityRepository.delete(authorityRepository.findByProjectIdAndUserId(projectId, userId));
 	}
 
-	private void authorityCheck(Long projectId, UserDetailsImpl userDetails) {
-		if (!authorityRepository.existsByProjectIdAndUserId(projectId, userDetails.getUser().getId())) {
-			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
-		}
-	}
-
+	@Transactional
+	@LogActivity(value = ActionType.PROJECT, detail = "프로젝트 권한 변경: #{#projectId} 번 프로젝트에 #{#userId}를 #{#requestDto.role}")
 	public void changeUserRole(UserDetailsImpl userDetails, Long projectId, ChangeRoleRequestDto requestDto) {
 		UserRole role = authorityService.getUserRole(projectId, userDetails.getUser().getId());
 		if (role != UserRole.ADMIN) {
@@ -278,8 +283,21 @@ public class ProjectService {
 		notificationService.increaseNotificationCount(targetUser.getId());
 	}
 
-	public List<Project> getProjects(List<Long> ids) {
-		return projectRepository.findAllById(ids);
+	@LogActivity(value = ActionType.PROJECT, detail = "초대 코드 생성: #{#projectId} 번 프로젝트")
+	public String inviteCodeCreate(Long projectId, UserDetailsImpl userDetails) {
+		authorityCheck(projectId, userDetails);
+		return redisService.createInviteCode(projectId, userDetails);
+	}
+
+	private void authorityCheck(Long projectId, UserDetailsImpl userDetails) {
+		if (!authorityRepository.existsByProjectIdAndUserId(projectId, userDetails.getUser().getId())) {
+			throw new AuthorityNullException(ResponseExceptionEnum.AUTHORITY_NULL_EXCEPTION);
+		}
+	}
+
+	public InviteCodeResponseDto inviteCodeGet(String code) {
+
+		return redisService.getInviteCode(code);
 	}
 }
 
