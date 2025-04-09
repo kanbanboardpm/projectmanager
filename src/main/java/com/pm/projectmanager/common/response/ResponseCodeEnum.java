@@ -24,6 +24,8 @@ public enum ResponseCodeEnum {
 	PROJECT_UPDATE_SUCCESS(HttpStatus.OK, "프로젝트 수정 성공"),
 	PROJECT_DELETE_SUCCESS(HttpStatus.OK, "프로젝트 삭제 성공"),
 	PROJECT_INVITE_SUCCESS(HttpStatus.OK, "프로젝트 초대 성공"),
+	PROJECT_INVITE_CODE_GENERATE_SUCCESS(HttpStatus.OK, "프로젝트 초대코드 생성 성공"),
+	PROJECT_INVITE_CODE_GET_SUCCESS(HttpStatus.OK, "프로젝트 초대코드 조회 성공"),
 	PROJECT_ACCEPT_SUCCESS(HttpStatus.OK, "프로젝트 초대 수락 성공"),
 	PROJECT_REFUSE_SUCCESS(HttpStatus.OK, "프로젝트 초대 거절 성공"),
 	PROJECT_USER_GET_SUCCESS(HttpStatus.OK, "프로젝트 유저 조회 성공"),

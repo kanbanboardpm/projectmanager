@@ -1,5 +1,7 @@
 package com.pm.projectmanager.domain.card;
 
+import com.pm.projectmanager.aop.activityLog.ActionType;
+import com.pm.projectmanager.aop.activityLog.LogActivity;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.authority.Authority;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
@@ -33,6 +35,8 @@ public class CardService {
     private final AuthorityService authorityService;
     private final CommentRepository commentRepository;
 
+    @Transactional
+    @LogActivity(value = ActionType.CARD, detail = "카드 생성: #{#requestDto.title}, in #{#projectId} 프로젝트")
     public void createCard(Long projectId, Long sectionId, CreateCardRequestDto requestDto, User user) {
         validateUserInProject(projectId, user.getId());
         Category category = categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(
@@ -78,6 +82,7 @@ public class CardService {
 
 
     @Transactional
+    @LogActivity(value = ActionType.CARD, detail = "카드 수정: #{#requestDto.title}, #{#cardId} 카드")
     public void updateCard(UpdateCardRequestDto requestDto, User user, Long cardId) {
         Card card = cardRepository.findByIdAndUserId(cardId, user.getId()).orElseThrow(
                 () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
@@ -95,6 +100,7 @@ public class CardService {
     }
 
     @Transactional
+    @LogActivity(value = ActionType.CARD, detail = "카드 삭제: #{#cardId}, in #{#requestDto.projectId} 프로젝트")
     public void deleteCard(DeleteCardRequestDto requestDto, User user, Long cardId) {
         validateUserInProject(requestDto.getProjectId(), user.getId());
         Card card = cardRepository.findById(cardId).orElseThrow(
@@ -112,6 +118,7 @@ public class CardService {
 
     // 카드 완료
     @Transactional
+    @LogActivity(value = ActionType.CARD, detail = "카드 완료: #{#cardId}")
     public void completeCard(CompleteCardRequestDto requestDto, User user, Long cardId) {
         Card card = cardRepository.findById(cardId).orElseThrow(
                 () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
@@ -127,6 +134,7 @@ public class CardService {
     }
 
     @Transactional
+    @LogActivity(value = ActionType.CARD, detail = "카드 완료 취소: #{#cardId}")
     public void progressCard(Long cardId, User user) {
         Card card = cardRepository.findById(cardId).orElseThrow(
                 () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)

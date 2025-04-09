@@ -1,6 +1,8 @@
 package com.pm.projectmanager.domain.comment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.pm.projectmanager.aop.activityLog.ActionType;
+import com.pm.projectmanager.aop.activityLog.LogActivity;
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.authority.AuthorityService;
@@ -34,6 +36,8 @@ public class CommentService {
     private final AuthorityService authorityService;
     private final NotificationService notificationService;
 
+    @Transactional
+    @LogActivity(value = ActionType.COMMENT, detail = "댓글 생성: #{#requestDto.content}, in #{#cardId} 카드")
     public void createComment(CreateCommentRequestDto requestDto, User user, Long cardId) throws JsonProcessingException {
         Card card = cardRepository.findById(cardId).orElseThrow(
                 () -> new CardNotFoundException(ResponseExceptionEnum.CARD_NOT_FOUND)
@@ -64,6 +68,7 @@ public class CommentService {
     }
 
     @Transactional
+    @LogActivity(value = ActionType.COMMENT, detail = "댓글 수정: #{#requestDto.content}, in #{#commentId} 댓글")
     public void updateComment(UpdateCommentRequestDto requestDto, User user, Long commentId) {
 
         Comment comment = commentRepository.findByIdAndUserId(commentId, user.getId()).orElseThrow(
@@ -77,6 +82,7 @@ public class CommentService {
     }
 
     @Transactional
+    @LogActivity(value = ActionType.COMMENT, detail = "댓글 삭제: #{#commentId}")
     public void deleteComment(User user, Long commentId) {
         Comment comment = commentRepository.findByIdAndUserId(commentId, user.getId()).orElseThrow(
                 () -> new CommentNotFoundException(ResponseExceptionEnum.COMMENT_NOT_FOUND)

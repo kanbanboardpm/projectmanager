@@ -4,6 +4,8 @@ import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_ACC
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_CREATE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_DELETE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_GET_SUCCESS;
+import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_INVITE_CODE_GENERATE_SUCCESS;
+import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_INVITE_CODE_GET_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_INVITE_GET_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_INVITE_SUCCESS;
 import static com.pm.projectmanager.common.response.ResponseCodeEnum.PROJECT_REFUSE_SUCCESS;
@@ -20,21 +22,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pm.projectmanager.common.response.HttpResponseDto;
 import com.pm.projectmanager.domain.project.dto.ChangeRoleRequestDto;
+import com.pm.projectmanager.domain.project.dto.InviteCodeDto;
+import com.pm.projectmanager.domain.project.dto.InviteCodeResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectCreateResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectInviteDto;
 import com.pm.projectmanager.domain.project.dto.ProjectResponseDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUpdateDto;
 import com.pm.projectmanager.domain.project.dto.ProjectUserResponseDto;
+import com.pm.projectmanager.domain.user.User;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.security.UserDetailsImpl;
 
@@ -147,5 +154,32 @@ public class ProjectController {
 	) {
 		projectService.changeUserRole(userDetails, projectId, requestDto);
 		return of(PROJECT_USER_ROLE_CHANGE_SUCCESS);
+	}
+
+	@PostMapping("/invites/code/{projectId}")
+	public ResponseEntity<HttpResponseDto> inviteCode(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable Long projectId
+	) {
+		String code = projectService.inviteCodeCreate(projectId, userDetails);
+		InviteCodeDto dto = new InviteCodeDto(code);
+		return of(PROJECT_INVITE_CODE_GENERATE_SUCCESS, dto);
+	}
+
+	@GetMapping("/invites/code/{code}")
+	public ResponseEntity<HttpResponseDto> inviteCode(
+		@PathVariable String code
+	) {
+		InviteCodeResponseDto responseDto = projectService.inviteCodeGet(code);
+		return of(PROJECT_INVITE_CODE_GET_SUCCESS, responseDto);
+	}
+
+	@PostMapping("/invites/code/{projectId}/accept")
+	public ResponseEntity<HttpResponseDto> inviteCodeAccept(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable Long projectId
+	) {
+		projectService.inviteCodeAccept(projectId, userDetails);
+		return of(PROJECT_ACCEPT_SUCCESS);
 	}
 }

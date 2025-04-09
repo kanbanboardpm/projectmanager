@@ -8,6 +8,8 @@ import com.pm.projectmanager.exception.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.pm.projectmanager.aop.activityLog.ActionType;
+import com.pm.projectmanager.aop.activityLog.LogActivity;
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.user.dto.SignupRequestDto;
@@ -53,6 +55,7 @@ public class UserService {
 	}
 
 	@Transactional
+	@LogActivity(value = ActionType.USER, detail = "유저 수정: #{#requestDto.nickname}")
 	public void update(String nickname, UserDetailsImpl userDetails, MultipartFile image) throws IOException {
 
 		if (!nickname.equals(userDetails.getUser().getNickname()) && userRepository.existsByNickname(nickname)) {
@@ -78,6 +81,7 @@ public class UserService {
 	}
 
 	@Transactional
+	@LogActivity(value = ActionType.USER, detail = "비밀번호 수정: #{#user.username}")
 	public void updatePassword(PasswordRequestDto requestDto, UserDetailsImpl userDetails) {
 
 		User user = userDetails.getUser();
@@ -91,6 +95,7 @@ public class UserService {
 	}
 
 	@Transactional
+	@LogActivity(value = ActionType.USER, detail = "유저 탈퇴: #{#user.username}")
 	public void withdraw(WithdrawRequestDto requestDto, UserDetailsImpl userDetails) {
 
 		if (passwordEncoder.matches(requestDto.getPassword(), userDetails.getPassword())) {

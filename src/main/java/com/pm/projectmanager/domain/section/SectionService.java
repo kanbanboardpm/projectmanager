@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.pm.projectmanager.aop.activityLog.ActionType;
+import com.pm.projectmanager.aop.activityLog.LogActivity;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
 import com.pm.projectmanager.domain.authority.AuthorityRepository;
 import com.pm.projectmanager.domain.authority.AuthorityService;
@@ -38,6 +40,8 @@ public class SectionService {
 	private final CommentRepository commentRepository;
 	private final CardRepository cardRepository;
 
+	@Transactional
+	@LogActivity(value = ActionType.SECTION, detail = "섹션 생성: #{#requestDto.name}, in #{#projectId} 프로젝트")
 	public void create(Long projectId, SectionCreateDto requestDto, UserDetailsImpl userDetails) {
 
 		Project project = projectRepository.findById(projectId)
@@ -80,6 +84,7 @@ public class SectionService {
 	}
 
 	@Transactional
+	@LogActivity(value = ActionType.SECTION, detail = "섹션 수정: #{#requestDto.name}, in #{#projectId} 프로젝트")
 	public void update(Long projectId, Long sectionId, SectionUpdateDto requestDto, UserDetailsImpl userDetails) {
 		if (!authorityService.adminCheck(projectId, userDetails.getUser().getId())) {
 			throw new UserRoleException(ResponseExceptionEnum.ADMIN_ROLE_REQUIRED);
@@ -92,6 +97,7 @@ public class SectionService {
 	}
 
 	@Transactional
+	@LogActivity(value = ActionType.SECTION, detail = "섹션 삭제: #{#sectionId}, in #{#projectId} 프로젝트")
 	public void delete(Long projectId, Long sectionId, UserDetailsImpl userDetails) {
 		if (!authorityService.adminCheck(projectId, userDetails.getUser().getId())) {
 			throw new UserRoleException(ResponseExceptionEnum.ADMIN_ROLE_REQUIRED);
