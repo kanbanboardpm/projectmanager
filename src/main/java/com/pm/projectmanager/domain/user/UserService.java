@@ -4,18 +4,16 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 import com.pm.projectmanager.common.gcs.GoogleCloudStorageService;
+import com.pm.projectmanager.exception.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.pm.projectmanager.common.RedisService;
 import com.pm.projectmanager.common.response.ResponseExceptionEnum;
-import com.pm.projectmanager.domain.user.dto.UpdateRequestDto;
 import com.pm.projectmanager.domain.user.dto.SignupRequestDto;
 import com.pm.projectmanager.domain.user.dto.PasswordRequestDto;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;
 import com.pm.projectmanager.domain.user.dto.WithdrawRequestDto;
-import com.pm.projectmanager.exception.PasswordIncorrectException;
-import com.pm.projectmanager.exception.UserAlreadyExistsException;
 import com.pm.projectmanager.security.UserDetailsImpl;
 
 import jakarta.transaction.Transactional;
@@ -61,8 +59,14 @@ public class UserService {
 			throw new UserAlreadyExistsException(ResponseExceptionEnum.NICKNAME_ALREADY_EXISTS);
 		}
 
-		User user = userDetails.getUser();
         String imageUrl = googleCloudStorageService.uploadImage(image);
+        User user = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
+                () -> new UserNotFoundException(ResponseExceptionEnum.USER_NOT_FOUND)
+        );
+        boolean isImage = googleCloudStorageService.deleteImage(user.getPhotoUrl());
+        if(!isImage) {
+            throw new ImageUrlNotFoundException(ResponseExceptionEnum.IMAGE_URL_NOT_FOUND);
+        }
 		user.update(nickname, imageUrl);
 		userRepository.save(user);
 	}
