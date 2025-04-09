@@ -1,13 +1,11 @@
 package com.pm.projectmanager.domain.user;
 
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pm.projectmanager.common.response.HttpResponseDto;
-import com.pm.projectmanager.domain.user.dto.UpdateRequestDto;
 import com.pm.projectmanager.domain.user.dto.SignupRequestDto;
 import com.pm.projectmanager.domain.user.dto.PasswordRequestDto;
 import com.pm.projectmanager.domain.user.dto.UserResponseDto;

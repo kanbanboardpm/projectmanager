@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.UUID;
 
 @Service
@@ -58,12 +60,34 @@ public class GoogleCloudStorageService {
 
         storage.create(blobInfo, image.getInputStream());
 
-        String gcsImageUrl = "https://storage.cloud.google.com/projectmanager_bucket/" + uniqueFileName;
-        System.out.println("✅ File uploaded as: " + gcsImageUrl);
+        String gcsImageUrl = "https://storage.googleapis.com/projectmanager_bucket/" + uniqueFileName;
         return gcsImageUrl;
     }
 
-    public void deleteImage() {
-        System.out.println("good");
+    public boolean deleteImage(String fileName) throws IOException {
+        String keyFileName = "projectmanager_bucket_key.json"; // 인증키 파일
+        InputStream keyFile = getClass().getClassLoader().getResourceAsStream(keyFileName);
+
+        if (keyFile == null) {
+            throw new IllegalStateException("GOOGLE_APPLICATION_CREDENTIALS 경로에 파일이 존재하지 않습니다.");
+        }
+
+        Storage storage = StorageOptions.newBuilder()
+                .setCredentials(GoogleCredentials.fromStream(keyFile))
+                .build()
+                .getService();
+        String originFileName = extractFileNameFromGcsUrl(fileName);
+        return storage.delete(bucketName, originFileName);
     }
+
+    public String extractFileNameFromGcsUrl(String url) {
+        try {
+            URI uri = new URI(url);
+            String path = uri.getPath(); // /projectmanager_bucket/경로/파일명.jpg
+            return path.substring(path.lastIndexOf('/') + 1); // 마지막 / 이후 파일명만 추출
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("잘못된 URL 형식입니다: " + url);
+        }
+    }
+
 }

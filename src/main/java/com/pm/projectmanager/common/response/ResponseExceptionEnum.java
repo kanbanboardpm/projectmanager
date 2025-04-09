@@ -37,7 +37,9 @@ public enum ResponseExceptionEnum {
     // notification
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글 관련 알림이 없습니다."),
 	// authority
-	ADMIN_ROLE_REQUIRED(HttpStatus.FORBIDDEN, "관리자 권한이 필요합니다.");
+	ADMIN_ROLE_REQUIRED(HttpStatus.FORBIDDEN, "관리자 권한이 필요합니다."),
+    // gcs
+    IMAGE_URL_NOT_FOUND(HttpStatus.NOT_FOUND, "GCS에서 이미지를 찾을 수 없습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;
