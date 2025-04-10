@@ -64,32 +64,21 @@ public class GoogleCloudStorageService {
         return gcsImageUrl;
     }
 
-    public boolean deleteImage(String fileName) {
-        try {
-            if (fileName == null || fileName.isEmpty()) {
-                return false;
-            }
+    public boolean deleteImage(String fileName) throws IOException {
+        String keyFileName = "projectmanager_bucket_key.json"; // 인증키 파일
+        InputStream keyFile = getClass().getClassLoader().getResourceAsStream(keyFileName);
 
-            String keyFileName = "projectmanager_bucket_key.json";
-            InputStream keyFile = getClass().getClassLoader().getResourceAsStream(keyFileName);
-
-            if (keyFile == null) {
-                return false;
-            }
-
-            Storage storage = StorageOptions.newBuilder()
-                    .setCredentials(GoogleCredentials.fromStream(keyFile))
-                    .build()
-                    .getService();
-
-            String originFileName = extractFileNameFromGcsUrl(fileName);
-            return storage.delete(bucketName, originFileName);
-
-        } catch (Exception e) {
-            return false;
+        if (keyFile == null) {
+            return true;
         }
-    }
 
+        Storage storage = StorageOptions.newBuilder()
+                .setCredentials(GoogleCredentials.fromStream(keyFile))
+                .build()
+                .getService();
+        String originFileName = extractFileNameFromGcsUrl(fileName);
+        return storage.delete(bucketName, originFileName);
+    }
 
     public String extractFileNameFromGcsUrl(String url) {
         try {
