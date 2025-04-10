@@ -68,10 +68,6 @@ public class GoogleCloudStorageService {
         String keyFileName = "projectmanager_bucket_key.json"; // 인증키 파일
         InputStream keyFile = getClass().getClassLoader().getResourceAsStream(keyFileName);
 
-        if (keyFile == null) {
-            throw new IllegalStateException("GOOGLE_APPLICATION_CREDENTIALS 경로에 파일이 존재하지 않습니다.");
-        }
-
         Storage storage = StorageOptions.newBuilder()
                 .setCredentials(GoogleCredentials.fromStream(keyFile))
                 .build()
