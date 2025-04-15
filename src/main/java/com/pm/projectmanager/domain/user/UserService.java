@@ -55,7 +55,7 @@ public class UserService {
 	}
 
 	@Transactional
-	@LogActivity(value = ActionType.USER, detail = "유저 수정: #{#requestDto.nickname}")
+	@LogActivity(value = ActionType.USER, detail = "유저 수정: #{#nickname}")
 	public void update(String nickname, UserDetailsImpl userDetails, MultipartFile image) throws IOException {
 
 		if (!nickname.equals(userDetails.getUser().getNickname()) && userRepository.existsByNickname(nickname)) {
